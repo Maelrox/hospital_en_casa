@@ -1,0 +1,156 @@
+.sidenav-container {
+  height: calc(100vh - 64px);
+  margin-top: 64px;
+}
+
+.sidenav {
+  width: 250px;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.logo {
+  max-width: 150px;
+  height: auto;
+}
+.sidenav .mat-nav-list {
+  padding-top: 0;
+  flex: 1;
+}
+
+.sidenav .mat-list-item {
+  height: 48px;
+  margin: 4px 0;
+  cursor: pointer;
+}
+
+.sidenav .mat-list-item.active {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.sidenav .mat-icon {
+  margin-right: 16px;
+}
+
+.mat-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.menu-button {
+  display: none;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-email {
+  margin-right: 16px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.content {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-footer .mat-list-item {
+  color: #f44336;
+  cursor: pointer;
+}
+
+.sidebar-footer .mat-icon {
+  color: #f44336;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+  z-index: 999;
+  display: none;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.mobile-menu.show {
+  transform: translateY(0);
+}
+
+.mobile-menu a {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: rgba(0, 0, 0, 0.87);
+  text-decoration: none;
+  width: 100%;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+
+.mobile-menu a:last-child {
+  border-bottom: none;
+}
+
+.mobile-menu a mat-icon {
+  margin-right: 16px;
+}
+
+.mobile-menu a.active {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.mobile-menu .logout-button {
+  color: #f44336;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .menu-button {
+    display: block;
+  }
+
+  .sidenav {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: block;
+  }
+
+  .user-email {
+    display: none;
+  }
+
+  .content {
+    margin-left: 0;
+  }
+}
+
+a.mdc-list-item {
+  cursor: pointer;
+}

@@ -1,0 +1,13 @@
+{
+    "html.validate.scripts": false,
+    "html.validate.styles": false,
+    "html.customData": ["./node_modules/@angular/language-service/ng_language_service_plugin.js"],
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": true
+    },
+    "angular.enable-strict-mode-prompt": true,
+    "angular.suggest.strictTemplates": true
+} 

@@ -1,0 +1,104 @@
+.login-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 50%, #4299e1 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+mat-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+mat-card-title {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+mat-card-subtitle {
+  font-size: 1rem;
+  color: #718096;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+button[mat-raised-button] {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 1rem;
+  color: #4a5568;
+}
+
+.register-link p {
+  margin: 0;
+}
+
+.error-message {
+  color: #e53e3e;
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background-color: #fff5f5;
+  border-radius: 0.375rem;
+}
+
+@media (max-width: 640px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+
+  mat-card-title {
+    font-size: 1.5rem;
+  }
+
+  .logo {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+mat-card-subtitle.mat-mdc-card-subtitle {
+  text-align: center;
+}

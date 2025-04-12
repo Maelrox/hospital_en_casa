@@ -1,0 +1,50 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <div class="logo-container">
+      <img src="assets/images/logo.png" alt="Hospital en Casa Logo" class="logo">
+    </div>
+
+    <mat-card-header>
+      <mat-card-title>Hospital en Casa</mat-card-title>
+      <mat-card-subtitle>Iniciar Sesión</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field class="full-width" appearance="outline">
+          <mat-label>Nombre de Usuario</mat-label>
+          <input matInput formControlName="nombre_usuario" placeholder="Ingrese su nombre de usuario" autocomplete="username">
+          <mat-error *ngIf="loginForm.get('nombre_usuario')?.hasError('required')">
+            El nombre de usuario es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="full-width" appearance="outline">
+          <mat-label>Contraseña</mat-label>
+          <input matInput formControlName="contraseña" type="password" placeholder="Ingrese su contraseña" autocomplete="password">
+          <mat-error *ngIf="loginForm.get('contraseña')?.hasError('required')">
+            La contraseña es requerida
+          </mat-error>
+        </mat-form-field>
+
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
+        <div class="button-container">
+          <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid">
+            Iniciar Sesión
+          </button>
+        </div>
+
+        <div class="register-link">
+          <p>¿No tienes una cuenta? 
+            <button mat-button color="primary" (click)="openRegisterDialog($event)">
+              Regístrate aquí
+            </button>
+          </p>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div> 

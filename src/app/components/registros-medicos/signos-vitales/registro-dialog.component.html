@@ -1,0 +1,114 @@
+<h2 mat-dialog-title>Registro de Signos Vitales</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <mat-form-field class="half-width">
+        <mat-label>ID del Paciente</mat-label>
+        <input matInput formControlName="pacienteId" required>
+        <mat-error *ngIf="registroForm.get('pacienteId')?.hasError('required')">
+          El ID del paciente es requerido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="half-width">
+        <mat-label>Oximetría (%)</mat-label>
+        <input matInput type="number" formControlName="oximetria" required>
+        <mat-error *ngIf="registroForm.get('oximetria')?.hasError('required')">
+          La oximetría es requerida
+        </mat-error>
+        <mat-error *ngIf="registroForm.get('oximetria')?.hasError('min') || registroForm.get('oximetria')?.hasError('max')">
+          La oximetría debe estar entre 0 y 100
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field class="half-width">
+        <mat-label>Frecuencia Respiratoria (rpm)</mat-label>
+        <input matInput type="number" formControlName="frecuenciaRespiratoria" required>
+        <mat-error *ngIf="registroForm.get('frecuenciaRespiratoria')?.hasError('required')">
+          La frecuencia respiratoria es requerida
+        </mat-error>
+        <mat-error *ngIf="registroForm.get('frecuenciaRespiratoria')?.hasError('min')">
+          La frecuencia respiratoria debe ser mayor a 0
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="half-width">
+        <mat-label>Frecuencia Cardíaca (lpm)</mat-label>
+        <input matInput type="number" formControlName="frecuenciaCardiaca" required>
+        <mat-error *ngIf="registroForm.get('frecuenciaCardiaca')?.hasError('required')">
+          La frecuencia cardíaca es requerida
+        </mat-error>
+        <mat-error *ngIf="registroForm.get('frecuenciaCardiaca')?.hasError('min')">
+          La frecuencia cardíaca debe ser mayor a 0
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field class="half-width">
+        <mat-label>Temperatura (°C)</mat-label>
+        <input matInput type="number" formControlName="temperatura" required>
+        <mat-error *ngIf="registroForm.get('temperatura')?.hasError('required')">
+          La temperatura es requerida
+        </mat-error>
+        <mat-error *ngIf="registroForm.get('temperatura')?.hasError('min') || registroForm.get('temperatura')?.hasError('max')">
+          La temperatura debe estar entre 35 y 42
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="half-width">
+        <mat-label>Presión Arterial (mmHg)</mat-label>
+        <input matInput formControlName="presionArterial" required>
+        <mat-error *ngIf="registroForm.get('presionArterial')?.hasError('required')">
+          La presión arterial es requerida
+        </mat-error>
+        <mat-error *ngIf="registroForm.get('presionArterial')?.hasError('pattern')">
+          Formato inválido (ej: 120/80)
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field class="half-width">
+        <mat-label>Glicemia (mg/dL)</mat-label>
+        <input matInput type="number" formControlName="glicemia" required>
+        <mat-error *ngIf="registroForm.get('glicemia')?.hasError('required')">
+          La glicemia es requerida
+        </mat-error>
+        <mat-error *ngIf="registroForm.get('glicemia')?.hasError('min')">
+          La glicemia debe ser mayor a 0
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="half-width">
+        <mat-label>Tipo de Registrante</mat-label>
+        <mat-select formControlName="tipoRegistrante" required>
+          <mat-option value="medico">Médico</mat-option>
+          <mat-option value="enfermero">Enfermero</mat-option>
+          <mat-option value="familiar">Familiar</mat-option>
+        </mat-select>
+        <mat-error *ngIf="registroForm.get('tipoRegistrante')?.hasError('required')">
+          El tipo de registrante es requerido
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field class="full-width">
+      <mat-label>ID del Registrante</mat-label>
+      <input matInput formControlName="registranteId" required>
+      <mat-error *ngIf="registroForm.get('registranteId')?.hasError('required')">
+        El ID del registrante es requerido
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="!registroForm.valid" (click)="onSubmit()">
+    Registrar
+  </button>
+</mat-dialog-actions> 

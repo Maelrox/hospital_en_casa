@@ -1,59 +1,133 @@
-# HospitalEnCasa
+# Hospital en Casa - Guía de Instalación
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.6.
+## Requisitos Previos
 
-## Development server
+1. **Node.js y npm**
+   - Descargar e instalar Node.js desde [nodejs.org](https://nodejs.org/)
+   - Versión recomendada: LTS (Long Term Support)
+   - Durante la instalación, asegúrate de marcar la opción "Automatically install the necessary tools"
 
-To start a local development server, run:
+2. **Angular CLI**
+   - Abrir PowerShell como Administrador
+   - Ejecutar el siguiente comando:
+   ```powershell
+   npm install -g @angular/cli
+   ```
 
-```bash
-ng serve
-```
+## Configuración de Variables de Entorno
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+1. **Verificar la instalación de Node.js**
+   - Abrir PowerShell
+   - Ejecutar:
+   ```powershell
+   node --version
+   npm --version
+   ```
+   - Si no funcionan, necesitas configurar las variables de entorno
 
-## Code scaffolding
+2. **Configurar Variables de Entorno**
+   - Presionar `Windows + R`
+   - Escribir `sysdm.cpl` y presionar Enter
+   - Ir a la pestaña "Opciones avanzadas"
+   - Hacer clic en "Variables de entorno"
+   - En "Variables del sistema", buscar "Path"
+   - Hacer clic en "Editar"
+   - Hacer clic en "Nuevo"
+   - Agregar las siguientes rutas:
+     ```
+     C:\Program Files\nodejs\
+     %AppData%\npm
+     ```
+   - Hacer clic en "Aceptar" en todas las ventanas
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+3. **Verificar la instalación de Angular CLI**
+   - Cerrar y volver a abrir PowerShell
+   - Ejecutar:
+   ```powershell
+   ng version
+   ```
+   - Si no funciona, intenta reiniciar la computadora
 
-```bash
-ng generate component component-name
-```
+## Instalación del Proyecto
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+1. **Clonar el repositorio**
+   ```powershell
+   git clone [URL_DEL_REPOSITORIO]
+   cd hospital_en_casa
+   ```
 
-```bash
-ng generate --help
-```
+2. **Instalar dependencias**
+   ```powershell
+   npm install
+   ```
 
-## Building
+3. **Iniciar el servidor de desarrollo**
+   ```powershell
+   ng serve
+   ```
 
-To build the project run:
+4. **Abrir el navegador**
+   - Ir a `http://localhost:4200`
 
-```bash
-ng build
-```
+## Solución de Problemas Comunes
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Problema: Comando 'ng' no reconocido
+**Solución:**
+1. Verificar que Node.js esté instalado correctamente
+2. Verificar las variables de entorno
+3. Intentar instalar Angular CLI localmente:
+   ```powershell
+   npm install @angular/cli
+   npx ng version
+   ```
 
-## Running unit tests
+### Problema: Error al instalar dependencias
+**Solución:**
+1. Limpiar la caché de npm:
+   ```powershell
+   npm cache clean --force
+   ```
+2. Eliminar la carpeta node_modules:
+   ```powershell
+   rm -rf node_modules
+   ```
+3. Reinstalar dependencias:
+   ```powershell
+   npm install
+   ```
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Problema: Puerto 4200 en uso
+**Solución:**
+1. Encontrar el proceso que usa el puerto:
+   ```powershell
+   netstat -ano | findstr :4200
+   ```
+2. Terminar el proceso:
+   ```powershell
+   taskkill /PID [NUMERO_DE_PID] /F
+   ```
+3. O usar un puerto diferente:
+   ```powershell
+   ng serve --port 4201
+   ```
 
-```bash
-ng test
-```
+## Comandos Útiles
 
-## Running end-to-end tests
+- **Generar un nuevo componente:**
+  ```powershell
+  ng generate component nombre-del-componente
+  ```
 
-For end-to-end (e2e) testing, run:
+- **Construir para producción:**
+  ```powershell
+  ng build --prod
+  ```
 
-```bash
-ng e2e
-```
+- **Ejecutar pruebas:**
+  ```powershell
+  ng test
+  ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Contacto
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Para soporte técnico o reportar problemas, contactar al administrador del sistema.

@@ -1,0 +1,15 @@
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.search-field {
+  width: 300px;
+}

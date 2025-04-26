@@ -1,12 +1,14 @@
+import { Medico, Paciente } from "./usuario.interface";
+
 export interface HistorialClinico {
-    id_historial?: number;
-    id_paciente: number;
-    id_medico: number;
-    fecha_registro?: Date;
+    idHistorial?: number;
+    idPaciente: number;
+    idMedico: number;
+    fechaRegistro?: Date;
     diagnostico: string;
     observaciones?: string;
     tratamiento?: string;
-    seguimiento_requerido?: boolean;
+    seguimientoRequerido?: boolean;
 }
 
 export interface SignosVitales {
@@ -22,4 +24,17 @@ export interface SignosVitales {
     glicemia?: number;
     idRegistrador: number;
     tipoRegistrador: 'medico' | 'familiar' | 'paciente';
+} 
+
+export interface SugerenciaCuidado {
+    idSugerencia: number;
+    idPaciente: number;
+    idMedico: number;
+    fechaRegistro: Date;
+    prioridad: string;
+    descripcion: string;
+    duracionTratamiento: number;
+    activo: boolean;
+    paciente: Paciente;
+    medico: Medico;
 } 

@@ -1,87 +1,68 @@
-<h2 mat-dialog-title>Registro de Historial Clínico</h2>
+<h2 mat-dialog-title>Nuevo Registro de Historial Clínico</h2>
 
 <mat-dialog-content>
-  <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="registroForm" class="form-container">
     <div class="form-row">
-      <mat-form-field class="half-width">
-        <mat-label>ID del Paciente</mat-label>
-        <input matInput formControlName="pacienteId" required>
-        <mat-error *ngIf="registroForm.get('pacienteId')?.hasError('required')">
-          El ID del paciente es requerido
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field class="half-width">
-        <mat-label>Diagnóstico</mat-label>
-        <input matInput formControlName="diagnostico" required>
-        <mat-error *ngIf="registroForm.get('diagnostico')?.hasError('required')">
-          El diagnóstico es requerido
-        </mat-error>
-      </mat-form-field>
-    </div>
-
-    <div class="form-row">
-      <mat-form-field class="half-width">
-        <mat-label>Tratamiento</mat-label>
-        <textarea matInput formControlName="tratamiento" required rows="3"></textarea>
-        <mat-error *ngIf="registroForm.get('tratamiento')?.hasError('required')">
-          El tratamiento es requerido
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field class="half-width">
-        <mat-label>Medicamentos</mat-label>
-        <textarea matInput formControlName="medicamentos" required rows="3"></textarea>
-        <mat-error *ngIf="registroForm.get('medicamentos')?.hasError('required')">
-          Los medicamentos son requeridos
-        </mat-error>
-      </mat-form-field>
-    </div>
-
-    <div class="form-row">
-      <mat-form-field class="half-width">
-        <mat-label>Alergias</mat-label>
-        <textarea matInput formControlName="alergias" rows="2"></textarea>
-      </mat-form-field>
-
-      <mat-form-field class="half-width">
-        <mat-label>Antecedentes</mat-label>
-        <textarea matInput formControlName="antecedentes" rows="2"></textarea>
-      </mat-form-field>
-    </div>
-
-    <mat-form-field class="full-width">
-      <mat-label>Observaciones</mat-label>
-      <textarea matInput formControlName="observaciones" rows="3"></textarea>
-    </mat-form-field>
-
-    <div class="form-row">
-      <mat-form-field class="half-width">
-        <mat-label>Tipo de Registrante</mat-label>
-        <mat-select formControlName="tipoRegistrante" required>
-          <mat-option value="medico">Médico</mat-option>
-          <mat-option value="enfermero">Enfermero</mat-option>
-          <mat-option value="familiar">Familiar</mat-option>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Paciente</mat-label>
+        <mat-select formControlName="idPaciente" [panelClass]="'patient-select-panel'">
+          <div class="search-container">
+            <input
+              matInput
+              type="text"
+              placeholder="Buscar por nombre o documento"
+              [ngModel]="pacienteSearchTerm"
+              (ngModelChange)="filterPacientes()"
+              [ngModelOptions]="{standalone: true}"
+              (click)="$event.stopPropagation()"
+              autocomplete="off"
+              class="search-input"
+            />
+          </div>
+          <mat-option
+            *ngFor="let paciente of filteredPacientes"
+            [value]="paciente.idPaciente"
+            (onSelectionChange)="onPacienteSelected(paciente)"
+          >
+            {{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellido }} - {{ paciente.usuario?.documentoIdentidad }}
+          </mat-option>
         </mat-select>
-        <mat-error *ngIf="registroForm.get('tipoRegistrante')?.hasError('required')">
-          El tipo de registrante es requerido
+        <mat-error *ngIf="registroForm.get('idPaciente')?.hasError('required')">
+          La selección del paciente es requerida
         </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Diagnóstico</mat-label>
+        <textarea matInput formControlName="diagnostico" rows="3"></textarea>
       </mat-form-field>
 
-      <mat-form-field class="half-width">
-        <mat-label>ID del Registrante</mat-label>
-        <input matInput formControlName="registranteId" required>
-        <mat-error *ngIf="registroForm.get('registranteId')?.hasError('required')">
-          El ID del registrante es requerido
-        </mat-error>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Tratamiento</mat-label>
+        <textarea matInput formControlName="tratamiento" rows="3"></textarea>
       </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Observaciones</mat-label>
+        <textarea matInput formControlName="observaciones" rows="3"></textarea>
+      </mat-form-field>
+
+      <div class="form-field">
+        <mat-checkbox formControlName="seguimientoRequerido">
+          Seguimiento Requerido
+        </mat-checkbox>
+      </div>
     </div>
   </form>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-raised-button color="primary" [disabled]="!registroForm.valid" (click)="onSubmit()">
-    Registrar
+  <button mat-button (click)="dialogRef.close()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!registroForm.valid">
+    Guardar
   </button>
 </mat-dialog-actions> 

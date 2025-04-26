@@ -88,7 +88,13 @@
 
           <mat-form-field class="full-width" appearance="outline">
             <mat-label>Contraseña</mat-label>
-            <input matInput type="password" formControlName="contraseña">
+            <input 
+              matInput 
+              type="password" 
+              formControlName="contraseña"
+              autocomplete="new-password"
+              aria-label="Contraseña"
+            >
             <mat-error *ngIf="registroForm.get('contraseña')?.hasError('required')">
               La contraseña es requerida
             </mat-error>
@@ -99,7 +105,13 @@
 
           <mat-form-field class="full-width" appearance="outline">
             <mat-label>Confirmar Contraseña</mat-label>
-            <input matInput type="password" formControlName="confirmarContraseña">
+            <input 
+              matInput 
+              type="password" 
+              formControlName="confirmarContraseña"
+              autocomplete="new-password"
+              aria-label="Confirmar contraseña"
+            >
             <mat-error *ngIf="registroForm.get('confirmarContraseña')?.hasError('required')">
               Por favor confirme su contraseña
             </mat-error>
@@ -183,6 +195,104 @@
                 El teléfono de emergencia es requerido
               </mat-error>
             </mat-form-field>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Medico specific fields -->
+      <ng-container *ngIf="isMedico">
+        <div class="form-section">
+          <h3 class="form-section-title">Información del Médico</h3>
+          <div class="form-row">
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Especialidad</mat-label>
+              <input matInput formControlName="especialidad">
+              <mat-error *ngIf="registroForm.get('especialidad')?.hasError('required')">
+                La especialidad es requerida
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Número de Licencia</mat-label>
+              <input matInput formControlName="numeroLicencia">
+              <mat-error *ngIf="registroForm.get('numeroLicencia')?.hasError('required')">
+                El número de licencia es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Registro Profesional</mat-label>
+              <input matInput formControlName="registroProfesional">
+              <mat-error *ngIf="registroForm.get('registroProfesional')?.hasError('required')">
+                El registro profesional es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Años de Experiencia</mat-label>
+              <input matInput type="number" formControlName="aniosExperiencia">
+              <mat-error *ngIf="registroForm.get('aniosExperiencia')?.hasError('required')">
+                Los años de experiencia son requeridos
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Familiar specific fields -->
+      <ng-container *ngIf="isFamiliar">
+        <div class="form-section">
+          <h3 class="form-section-title">Información del Familiar</h3>
+          <div class="form-row">
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Seleccionar Paciente</mat-label>
+              <mat-select formControlName="idPaciente" [panelClass]="'patient-select-panel'">
+                <div class="search-container">
+                  <input
+                    matInput
+                    type="text"
+                    placeholder="Buscar por nombre o documento"
+                    [ngModel]="pacienteSearchTerm"
+                    (ngModelChange)="filterPacientes()"
+                    [ngModelOptions]="{standalone: true}"
+                    (click)="$event.stopPropagation()"
+                    autocomplete="off"
+                    class="search-input"
+                  />
+                </div>
+                <mat-option
+                  *ngFor="let paciente of filteredPacientes"
+                  [value]="paciente.idPaciente"
+                  (onSelectionChange)="onPacienteSelected(paciente)"
+                >
+                  {{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellido }} - {{ paciente.usuario?.documentoIdentidad }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="registroForm.get('idPaciente')?.hasError('required')">
+                La selección del paciente es requerida
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Parentesco</mat-label>
+              <mat-select formControlName="parentesco">
+                <mat-option value="">Seleccione un parentesco</mat-option>
+                <mat-option value="padre">Padre</mat-option>
+                <mat-option value="madre">Madre</mat-option>
+                <mat-option value="hijo">Hijo</mat-option>
+                <mat-option value="hija">Hija</mat-option>
+                <mat-option value="esposo">Esposo</mat-option>
+                <mat-option value="esposa">Esposa</mat-option>
+                <mat-option value="otro">Otro</mat-option>
+              </mat-select>
+              <mat-error *ngIf="registroForm.get('parentesco')?.hasError('required')">
+                El parentesco es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-checkbox formControlName="autorizadoRegistroSignos" class="full-width">
+              Autorizado para registrar signos vitales
+            </mat-checkbox>
           </div>
         </div>
       </ng-container>

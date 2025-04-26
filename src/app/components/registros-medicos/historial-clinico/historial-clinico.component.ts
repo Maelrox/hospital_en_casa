@@ -1,18 +1,20 @@
-import { Component, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatSortModule, MatSort } from '@angular/material/sort';
 import { HistorialDialogComponent } from './registro-dialog.component';
+import { HistorialClinicoService } from '../../../services/historial-clinico.service';
+import { HistorialClinico } from '../../../interfaces/registros-medicos.interface';
+import { ToastService } from '../../../services/toast.service';
+import { AuthContextService } from '../../../auth/auth-context.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-historial-clinico',
@@ -20,36 +22,63 @@ import { HistorialDialogComponent } from './registro-dialog.component';
   imports: [
     CommonModule,
     MatTableModule,
-    MatPaginatorModule,
-    MatSortModule,
     MatButtonModule,
+    MatIconModule,
+    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatCardModule,
-    MatIconModule
+    MatPaginatorModule,
+    MatSortModule
   ],
   templateUrl: './historial-clinico.component.html',
   styleUrls: ['./historial-clinico.component.css']
 })
-export class HistorialClinicoComponent {
+export class HistorialClinicoComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = [
-    'fecha',
-    'id_paciente',
-    'nombre_paciente',
+    'fechaRegistro',
+    'nombrePaciente',
     'documento',
     'diagnostico',
     'tratamiento',
-    'medicamentos',
-    'registrador'
+    'observaciones',
+    'seguimientoRequerido',
+    'acciones'
   ];
-
-  dataSource: MatTableDataSource<any>;
+  dataSource: MatTableDataSource<HistorialClinico>;
+  isMedico: boolean = false;
+  isPaciente: boolean = false;
+  currentPatientId: number | null = null;
+  private authSubscription: Subscription | null = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private dialog: MatDialog) {
-    this.dataSource = new MatTableDataSource(this.historialClinico);
+  constructor(
+    private dialog: MatDialog,
+    private historialService: HistorialClinicoService,
+    private toastService: ToastService,
+    private authContext: AuthContextService
+  ) {
+    this.dataSource = new MatTableDataSource<HistorialClinico>([]);
+  }
+
+  ngOnInit() {
+    this.authSubscription = this.authContext.currentUser$.subscribe(user => {
+      if (user) {
+        this.isMedico = user.tipoUsuario === 'Médico';
+        this.isPaciente = user.tipoUsuario === 'Paciente';
+        this.currentPatientId = user.idPaciente || null;
+        this.loadHistorialClinico();
+      } else {
+        this.toastService.showError('Debe iniciar sesión para ver el historial clínico');
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
   }
 
   ngAfterViewInit() {
@@ -66,44 +95,66 @@ export class HistorialClinicoComponent {
     }
   }
 
-  openRegistroDialog(): void {
+  nuevoRegistro() {
+    if (!this.isMedico) {
+      this.toastService.showError('Función solo disponible para médicos');
+      return;
+    }
+    this.openRegistroDialog();
+  }
+
+  editarRegistro(historial: HistorialClinico) {
+    if (!this.isMedico) {
+      this.toastService.showError('Función solo disponible para médicos');
+      return;
+    }
     const dialogRef = this.dialog.open(HistorialDialogComponent, {
-      width: '800px'
+      width: '800px',
+      data: { historial }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.dataSource.data = [...this.dataSource.data, result];
+        this.loadHistorialClinico();
       }
     });
   }
 
-  historialClinico = [
-    {
-      fecha_registro: new Date('2024-03-15T10:30:00'),
-      nombre_paciente: 'Juan Pérez',
-      documento: '1234567890',
-      id_paciente: 1,
-      diagnostico: 'Hipertensión arterial',
-      tratamiento: 'Control de presión arterial y dieta baja en sodio',
-      medicamentos: 'Losartan 50mg 1 vez al día',
-      alergias: 'Penicilina',
-      antecedentes: 'Diabetes tipo 2',
-      observaciones: 'Paciente estable, seguir monitoreando',
-      tipo_registrador: 'medico'
-    },
-    {
-      fecha_registro: new Date('2024-03-15T11:45:00'),
-      nombre_paciente: 'María García',
-      documento: '9876543210',
-      id_paciente: 2,
-      diagnostico: 'Asma bronquial',
-      tratamiento: 'Uso de inhalador y evitar alérgenos',
-      medicamentos: 'Salbutamol 2 puff cada 6 horas',
-      alergias: 'Polvo, ácaros',
-      antecedentes: 'Ninguno',
-      observaciones: 'Mejoría en la respiración',
-      tipo_registrador: 'enfermero'
-    }
-  ];
+  loadHistorialClinico() {
+    this.historialService.obtenerTodos().subscribe({
+      next: (data) => {
+        // Filter data based on user type
+        let filteredData = data;
+        console.log(this.currentPatientId);
+        if (this.isPaciente && this.currentPatientId) {
+          filteredData = data.filter(record => record.idPaciente === this.currentPatientId);
+        }
+
+        // Sort by fechaRegistro in descending order
+        const sortedData = [...filteredData].sort((a, b) => {
+          const dateA = a.fechaRegistro ? new Date(a.fechaRegistro).getTime() : 0;
+          const dateB = b.fechaRegistro ? new Date(b.fechaRegistro).getTime() : 0;
+          return dateB - dateA;
+        });
+        this.dataSource.data = sortedData;
+      },
+      error: (error) => {
+        console.error('Error loading medical history:', error);
+        this.toastService.showError('Error al cargar el historial clínico');
+      }
+    });
+  }
+
+  openRegistroDialog() {
+    const dialogRef = this.dialog.open(HistorialDialogComponent, {
+      width: '800px',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadHistorialClinico();
+      }
+    });
+  }
 }

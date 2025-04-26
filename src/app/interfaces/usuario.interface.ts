@@ -3,14 +3,18 @@ export interface Usuario {
     tipoUsuario: 'Paciente' | 'Médico' | 'Paciente' | 'Familiar';
     nombre: string;
     apellido: string;
-    documentoIdentidad: string;
-    direccion?: string;
-    telefono?: string;
+    documentoIdentidad: string | null;
+    direccion: string | null;
+    telefono: string | null;
     correoElectronico: string;
     nombreUsuario: string;
     contraseña: string;
-    estado?: boolean;
+    estado: boolean;
     fechaRegistro?: Date;
+    token?: string;
+    idMedico?: number;
+    idPaciente?: number;
+    idFamiliar?: number;
 }
 
 export interface Paciente extends Usuario {

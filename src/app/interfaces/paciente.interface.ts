@@ -15,4 +15,5 @@ export interface Paciente {
     telefonoEmergencia: string;
     familiares: Familiar[];
     signosVitales: SignosVitales[];
+    usuario?: Usuario;
 } 

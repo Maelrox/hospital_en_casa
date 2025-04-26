@@ -1,149 +1,202 @@
-<h2 mat-dialog-title>Registro de Usuario</h2>
+<div class="registro-dialog">
+  <h2 mat-dialog-title>Registro de Usuario</h2>
+  <mat-dialog-content>
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit($event)">
+      <!-- Información Personal -->
+      <div class="form-section">
+        <h3 class="form-section-title">Información Personal</h3>
+        <div class="form-row">
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>Tipo de Usuario</mat-label>
+            <mat-select formControlName="tipoUsuario">
+              <mat-option *ngFor="let tipo of tiposUsuario" [value]="tipo.value">
+                {{tipo.viewValue}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="registroForm.get('tipoUsuario')?.hasError('required')">
+              El tipo de usuario es requerido
+            </mat-error>
+          </mat-form-field>
 
-<mat-dialog-content>
-  <form [formGroup]="registroForm" (ngSubmit)="onSubmit($event)">
-    <!-- Información Personal -->
-    <div class="form-section">
-      <h3 class="form-section-title">Información Personal</h3>
-      <div class="form-row">
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Nombre</mat-label>
-          <input matInput formControlName="nombre" placeholder="Ingrese su nombre">
-          <mat-error *ngIf="registroForm.get('nombre')?.hasError('required')">
-            El nombre es requerido
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('nombre')?.hasError('maxlength')">
-            El nombre no puede exceder 100 caracteres
-          </mat-error>
-        </mat-form-field>
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre">
+            <mat-error *ngIf="registroForm.get('nombre')?.hasError('required')">
+              El nombre es requerido
+            </mat-error>
+          </mat-form-field>
 
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Apellido</mat-label>
-          <input matInput formControlName="apellido" placeholder="Ingrese su apellido">
-          <mat-error *ngIf="registroForm.get('apellido')?.hasError('required')">
-            El apellido es requerido
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('apellido')?.hasError('maxlength')">
-            El apellido no puede exceder 100 caracteres
-          </mat-error>
-        </mat-form-field>
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="apellido">
+            <mat-error *ngIf="registroForm.get('apellido')?.hasError('required')">
+              El apellido es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>Documento de Identidad</mat-label>
+            <input matInput formControlName="documentoIdentidad">
+            <mat-error *ngIf="registroForm.get('documentoIdentidad')?.hasError('required')">
+              El documento de identidad es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
       </div>
 
-      <div class="form-row">
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Documento de Identidad</mat-label>
-          <input matInput formControlName="documento_identidad" placeholder="Ingrese su documento">
-          <mat-error *ngIf="registroForm.get('documento_identidad')?.hasError('required')">
-            El documento de identidad es requerido
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('documento_identidad')?.hasError('maxlength')">
-            El documento no puede exceder 20 caracteres
-          </mat-error>
-        </mat-form-field>
+      <!-- Información de Contacto -->
+      <div class="form-section">
+        <h3 class="form-section-title">Información de Contacto</h3>
+        <div class="form-row">
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>Dirección</mat-label>
+            <input matInput formControlName="direccion">
+          </mat-form-field>
 
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Tipo de Usuario</mat-label>
-          <mat-select formControlName="tipo_usuario">
-            <mat-option *ngFor="let tipo of tiposUsuario" [value]="tipo.value">
-              {{tipo.viewValue}}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="registroForm.get('tipo_usuario')?.hasError('required')">
-            El tipo de usuario es requerido
-          </mat-error>
-        </mat-form-field>
-      </div>
-    </div>
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono">
+            <mat-error *ngIf="registroForm.get('telefono')?.hasError('pattern')">
+              Por favor ingrese un número de teléfono válido
+            </mat-error>
+          </mat-form-field>
 
-    <!-- Información de Contacto -->
-    <div class="form-section">
-      <h3 class="form-section-title">Información de Contacto</h3>
-      <div class="form-row">
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Correo Electrónico</mat-label>
-          <input matInput formControlName="correo_electronico" type="email" placeholder="ejemplo@email.com">
-          <mat-error *ngIf="registroForm.get('correo_electronico')?.hasError('required')">
-            El correo electrónico es requerido
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('correo_electronico')?.hasError('email')">
-            Por favor ingrese un correo electrónico válido
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('correo_electronico')?.hasError('maxlength')">
-            El correo no puede exceder 100 caracteres
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Teléfono</mat-label>
-          <input matInput formControlName="telefono" placeholder="Ingrese su teléfono">
-          <mat-error *ngIf="registroForm.get('telefono')?.hasError('maxlength')">
-            El teléfono no puede exceder 20 caracteres
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('telefono')?.hasError('pattern')">
-            Ingrese un número de teléfono válido
-          </mat-error>
-        </mat-form-field>
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>Correo Electrónico</mat-label>
+            <input matInput type="email" formControlName="correoElectronico">
+            <mat-error *ngIf="registroForm.get('correoElectronico')?.hasError('required')">
+              El correo electrónico es requerido
+            </mat-error>
+            <mat-error *ngIf="registroForm.get('correoElectronico')?.hasError('email')">
+              Por favor ingrese un correo electrónico válido
+            </mat-error>
+          </mat-form-field>
+        </div>
       </div>
 
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>Dirección</mat-label>
-        <textarea matInput formControlName="direccion" placeholder="Ingrese su dirección"></textarea>
-        <mat-error *ngIf="registroForm.get('direccion')?.hasError('maxlength')">
-          La dirección no puede exceder 255 caracteres
-        </mat-error>
-      </mat-form-field>
-    </div>
+      <!-- Credenciales -->
+      <div class="form-section">
+        <h3 class="form-section-title">Credenciales</h3>
+        <div class="form-row">
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>Nombre de Usuario</mat-label>
+            <input matInput formControlName="nombreUsuario">
+            <mat-error *ngIf="registroForm.get('nombreUsuario')?.hasError('required')">
+              El nombre de usuario es requerido
+            </mat-error>
+          </mat-form-field>
 
-    <!-- Credenciales -->
-    <div class="form-section">
-      <h3 class="form-section-title">Credenciales</h3>
-      <div class="form-row">
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Nombre de Usuario</mat-label>
-          <input matInput formControlName="nombre_usuario" placeholder="Ingrese su nombre de usuario" autocomplete="new-username">
-          <mat-error *ngIf="registroForm.get('nombre_usuario')?.hasError('required')">
-            El nombre de usuario es requerido
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('nombre_usuario')?.hasError('maxlength')">
-            El nombre de usuario no puede exceder 50 caracteres
-          </mat-error>
-        </mat-form-field>
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>Contraseña</mat-label>
+            <input matInput type="password" formControlName="contraseña">
+            <mat-error *ngIf="registroForm.get('contraseña')?.hasError('required')">
+              La contraseña es requerida
+            </mat-error>
+            <mat-error *ngIf="registroForm.get('contraseña')?.hasError('minlength')">
+              La contraseña debe tener al menos 6 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="full-width" appearance="outline">
+            <mat-label>Confirmar Contraseña</mat-label>
+            <input matInput type="password" formControlName="confirmarContraseña">
+            <mat-error *ngIf="registroForm.get('confirmarContraseña')?.hasError('required')">
+              Por favor confirme su contraseña
+            </mat-error>
+            <mat-error *ngIf="registroForm.hasError('mismatch')">
+              Las contraseñas no coinciden
+            </mat-error>
+          </mat-form-field>
+        </div>
       </div>
 
-      <div class="form-row">
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Contraseña</mat-label>
-          <input matInput formControlName="contraseña" type="password" autocomplete="new-password">
-          <mat-error *ngIf="registroForm.get('contraseña')?.hasError('required')">
-            La contraseña es requerida
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('contraseña')?.hasError('minlength')">
-            La contraseña debe tener al menos 6 caracteres
-          </mat-error>
-        </mat-form-field>
+      <!-- Patient specific fields -->
+      <ng-container *ngIf="isPaciente">
+        <div class="form-section">
+          <h3 class="form-section-title">Información del Paciente</h3>
+          <div class="form-row">
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Fecha de Nacimiento</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-error *ngIf="registroForm.get('fechaNacimiento')?.hasError('required')">
+                La fecha de nacimiento es requerida
+              </mat-error>
+            </mat-form-field>
 
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Confirmar Contraseña</mat-label>
-          <input matInput formControlName="confirmar_contraseña" type="password" autocomplete="new-password">
-          <mat-error *ngIf="registroForm.get('confirmar_contraseña')?.hasError('required')">
-            La confirmación de contraseña es requerida
-          </mat-error>
-          <mat-error *ngIf="registroForm.hasError('mismatch')">
-            Las contraseñas no coinciden
-          </mat-error>
-        </mat-form-field>
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Sexo</mat-label>
+              <mat-select formControlName="sexo">
+                <mat-option value="M">Masculino</mat-option>
+                <mat-option value="F">Femenino</mat-option>
+                <mat-option value="O">Otro</mat-option>
+              </mat-select>
+              <mat-error *ngIf="registroForm.get('sexo')?.hasError('required')">
+                El sexo es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Tipo de Sangre</mat-label>
+              <input matInput formControlName="tipoSangre">
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Alergias</mat-label>
+              <textarea matInput formControlName="alergias" rows="2"></textarea>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Antecedentes</mat-label>
+              <textarea matInput formControlName="antecedentes" rows="2"></textarea>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Dirección de Residencia</mat-label>
+              <input matInput formControlName="direccionResidencia">
+              <mat-error *ngIf="registroForm.get('direccionResidencia')?.hasError('required')">
+                La dirección de residencia es requerida
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Contacto de Emergencia</mat-label>
+              <input matInput formControlName="contactoEmergencia">
+              <mat-error *ngIf="registroForm.get('contactoEmergencia')?.hasError('required')">
+                El contacto de emergencia es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Parentesco del Contacto</mat-label>
+              <input matInput formControlName="parentescoContacto">
+              <mat-error *ngIf="registroForm.get('parentescoContacto')?.hasError('required')">
+                El parentesco del contacto es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Teléfono de Emergencia</mat-label>
+              <input matInput formControlName="telefonoEmergencia">
+              <mat-error *ngIf="registroForm.get('telefonoEmergencia')?.hasError('required')">
+                El teléfono de emergencia es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
       </div>
-    </div>
 
-    <div *ngIf="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-  </form>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-  <button mat-raised-button color="primary" type="button" (click)="onSubmit($event)" [disabled]="!registroForm.valid">
-    Registrarse
-  </button>
-</mat-dialog-actions> 
+      <mat-dialog-actions align="end">
+        <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!registroForm.valid">
+          Registrarse
+        </button>
+      </mat-dialog-actions>
+    </form>
+  </mat-dialog-content>
+</div> 

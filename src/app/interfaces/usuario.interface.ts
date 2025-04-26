@@ -1,39 +1,39 @@
 export interface Usuario {
-    id_usuario?: number;
-    tipo_usuario: 'Paciente' | 'Médico' | 'Paciente' | 'Familiar';
+    idUsuario?: number;
+    tipoUsuario: 'Paciente' | 'Médico' | 'Paciente' | 'Familiar';
     nombre: string;
     apellido: string;
-    documento_identidad: string;
+    documentoIdentidad: string;
     direccion?: string;
     telefono?: string;
-    correo_electronico: string;
-    nombre_usuario: string;
+    correoElectronico: string;
+    nombreUsuario: string;
     contraseña: string;
     estado?: boolean;
-    fecha_registro?: Date;
+    fechaRegistro?: Date;
 }
 
 export interface Paciente extends Usuario {
     fecha_nacimiento: Date;
     sexo?: 'M' | 'F';
-    tipo_sangre?: string;
+    tipoSangre?: string;
     alergias?: string;
     antecedentes?: string;
-    direccion_residencia?: string;
-    contacto_emergencia?: string;
-    parentesco_contacto?: string;
-    telefono_emergencia?: string;
+    direccionResidencia?: string;
+    contactoEmergencia?: string;
+    parentescoContacto?: string;
+    telefonoEmergencia?: string;
 }
 
 export interface Medico extends Usuario {
     especialidad: string;
-    numero_licencia: string;
-    registro_profesional: string;
-    años_experiencia?: number;
+    numeroLicencia: string;
+    registroProfesional: string;
+    añosExperiencia?: number;
 }
 
 export interface Familiar extends Usuario {
     parentesco: string;
-    autorizado_registro_signos?: boolean;
-    id_paciente: number;
+    autorizadoRegistroSignos?: boolean;
+    paciente: Paciente;
 } 

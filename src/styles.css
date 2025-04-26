@@ -4,3 +4,27 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Toast Styles */
+.success-snackbar {
+  background-color: #4caf50;
+  color: white;
+}
+
+.error-snackbar {
+  background-color: #f44336;
+  color: white;
+}
+
+.mat-mdc-snack-bar-container {
+  margin-top: 64px !important;
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__label {
+  padding: 0 !important;
+}

@@ -38,7 +38,7 @@ export class LayoutComponent implements OnInit {
     const user = localStorage.getItem('currentUser');
     if (user) {
       const userData = JSON.parse(user);
-      return userData.correo_electronico || '';
+      return userData.correoElectronico || '';
     }
     return '';
   }

@@ -13,8 +13,8 @@
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <mat-form-field class="full-width" appearance="outline">
           <mat-label>Nombre de Usuario</mat-label>
-          <input matInput formControlName="nombre_usuario" placeholder="Ingrese su nombre de usuario" autocomplete="username">
-          <mat-error *ngIf="loginForm.get('nombre_usuario')?.hasError('required')">
+          <input matInput formControlName="nombreUsuario" placeholder="Ingrese su nombre de usuario" autocomplete="username">
+          <mat-error *ngIf="loginForm.get('nombreUsuario')?.hasError('required')">
             El nombre de usuario es requerido
           </mat-error>
         </mat-form-field>
@@ -38,11 +38,9 @@
         </div>
 
         <div class="register-link">
-          <p>¿No tienes una cuenta? 
-            <button mat-button color="primary" (click)="openRegisterDialog($event)">
-              Regístrate aquí
-            </button>
-          </p>
+          <button mat-button color="primary" (click)="openRegisterDialog($event)">
+            Registro de Usuarios
+          </button>
         </div>
       </form>
     </mat-card-content>

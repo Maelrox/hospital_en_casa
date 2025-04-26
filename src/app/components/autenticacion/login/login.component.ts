@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../auth/auth.service';
 import { HttpClient } from '@angular/common/http';
-
+import { ToastService } from '../../../services/toast.service';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -34,10 +34,11 @@ export class LoginComponent {
     private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastService
   ) {
     this.loginForm = this.fb.group({
-      nombre_usuario: ['', Validators.required],
+      nombreUsuario: ['', Validators.required],
       contraseña: ['', Validators.required]
     });
   }
@@ -49,14 +50,14 @@ export class LoginComponent {
           if (usuario) {
             this.router.navigate(['/home']);
           } else {
-            this.errorMessage = 'Credenciales inválidas';
+            this.toastService.showError('Error al iniciar sesión');
           }
         },
         error: (error) => {
-          this.errorMessage = 'Error al iniciar sesión';
+          this.toastService.showError('Credenciales inválidas');
           console.error('Login error:', error);
         }
-      });
+      })
     }
   }
 
@@ -64,11 +65,8 @@ export class LoginComponent {
     event.preventDefault();
     event.stopPropagation();
     const dialogRef = this.dialog.open(RegistroDialogComponent, {
-      width: '600px'
+      width: '960px'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-    });
   }
 } 

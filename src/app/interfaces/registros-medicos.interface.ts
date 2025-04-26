@@ -10,16 +10,16 @@ export interface HistorialClinico {
 }
 
 export interface SignosVitales {
-    id_signos?: number;
-    id_paciente: number;
-    fecha_registro?: Date;
+    idSignos?: number;
+    idPaciente: number;
+    fechaRegistro?: Date;
     oximetria?: number;
-    frecuencia_respiratoria?: number;
-    frecuencia_cardiaca?: number;
+    frecuenciaRespiratoria?: number;
+    frecuenciaCardiaca?: number;
     temperatura?: number;
-    presion_arterial_sistolica?: number;
-    presion_arterial_diastolica?: number;
+    presionArterialSistolica?: number;
+    presionArterialDiastolica?: number;
     glicemia?: number;
-    id_registrador: number;
-    tipo_registrador: 'medico' | 'familiar' | 'paciente';
+    idRegistrador: number;
+    tipoRegistrador: 'medico' | 'familiar' | 'paciente';
 } 

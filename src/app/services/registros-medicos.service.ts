@@ -21,18 +21,18 @@ export class RegistrosMedicosService {
 
   private signosVitalesMock: SignosVitales[] = [
     {
-      id_signos: 1,
-      id_paciente: 1,
-      fecha_registro: new Date(),
+      idSignos: 1,
+      idPaciente: 1,
+      fechaRegistro: new Date(),
       oximetria: 98,
-      frecuencia_respiratoria: 16,
-      frecuencia_cardiaca: 72,
+      frecuenciaRespiratoria: 16,
+      frecuenciaCardiaca: 72,
       temperatura: 36.5,
-      presion_arterial_sistolica: 120,
-      presion_arterial_diastolica: 80,
+      presionArterialSistolica: 120,
+      presionArterialDiastolica: 80,
       glicemia: 90,
-      id_registrador: 2,
-      tipo_registrador: 'medico'
+      idRegistrador: 2,
+      tipoRegistrador: 'medico'
     }
   ];
 
@@ -51,7 +51,7 @@ export class RegistrosMedicosService {
   }
 
   obtenerSignosVitales(idPaciente: number): Observable<SignosVitales[]> {
-    return of(this.signosVitalesMock.filter(s => s.id_paciente === idPaciente));
+    return of(this.signosVitalesMock.filter(s => s.idPaciente === idPaciente));
   }
 
   registrarSignosVitales(signos: SignosVitales): Observable<SignosVitales> {

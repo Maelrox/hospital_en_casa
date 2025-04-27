@@ -20,7 +20,15 @@
         </div>
       </div>
 
-      <div class="mat-elevation-z8">
+      <div *ngIf="dataSource.data.length === 0" class="empty-state">
+        <mat-icon class="empty-state-icon">medical_services</mat-icon>
+        <h2 class="empty-state-title">Sin registros clínicos</h2>
+        <p class="empty-state-subtitle" *ngIf="input.value">
+          No se encontraron registros que coincidan con "{{input.value}}"
+        </p>
+      </div>
+
+      <div class="mat-elevation-z8" *ngIf="dataSource.data.length > 0">
         <table mat-table [dataSource]="dataSource" matSort>
           <!-- Fecha Column -->
           <ng-container matColumnDef="fechaRegistro">
@@ -76,21 +84,6 @@
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-          <!-- Row shown when there is no matching data from search -->
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" colspan="8">No se encontraron datos que coincidan con "{{input.value}}"</td>
-          </tr>
-
-          <!-- Row shown when there are no records at all -->
-          <tr class="mat-row" *ngIf="dataSource.data.length === 0 && !input.value">
-            <td class="mat-cell" colspan="8">
-              <div class="no-data-message">
-                <mat-icon>info</mat-icon>
-                <span>Aún no hay registros clínicos</span>
-              </div>
-            </td>
-          </tr>
         </table>
 
         <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Seleccionar página de historial clínico"></mat-paginator>

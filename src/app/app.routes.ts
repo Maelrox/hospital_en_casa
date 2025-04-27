@@ -27,6 +27,10 @@ export const routes: Routes = [
       {
         path: 'signos-vitales',
         loadComponent: () => import('./components/registros-medicos/signos-vitales/signos-vitales.component').then(m => m.SignosVitalesComponent)
+      },
+      {
+        path: 'sugerencias-cuidado',
+        loadComponent: () => import('./components/registros-medicos/sugerencias-cuidado/sugerencias-cuidado.component').then(m => m.SugerenciasCuidadoComponent)
       }
     ]
   }

@@ -39,13 +39,13 @@
           <!-- Nombre Paciente Column -->
           <ng-container matColumnDef="nombrePaciente">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre Paciente </th>
-            <td mat-cell *matCellDef="let row"> {{row.nombrePaciente}} {{row.apellidoPaciente}}  </td>
+            <td mat-cell *matCellDef="let row"> {{row.paciente.usuario.nombre}} {{row.paciente.usuario.apellido}}  </td>
           </ng-container>
 
           <!-- Documento Column -->
           <ng-container matColumnDef="documento">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Documento </th>
-            <td mat-cell *matCellDef="let row"> {{row.documento}} </td>
+            <td mat-cell *matCellDef="let row"> {{row.paciente.usuario.documentoIdentidad}} </td>
           </ng-container>
 
           <!-- Diagnóstico Column -->

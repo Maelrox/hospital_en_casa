@@ -1,0 +1,92 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Sugerencias de Cuidado</mat-card-title>
+      <mat-card-subtitle>Registro y seguimiento de sugerencias de cuidado</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="toolbar">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Buscar por paciente o sugerencia" #input>
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <button *ngIf="isMedico" mat-raised-button color="primary" (click)="nuevoRegistro()">
+          <mat-icon>add</mat-icon>
+          Nueva Sugerencia
+        </button>
+      </div>
+
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+          <!-- Fecha Registro Column -->
+          <ng-container matColumnDef="fechaRegistro">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
+            <td mat-cell *matCellDef="let element"> {{element.fechaRegistro | date:'medium'}} </td>
+          </ng-container>
+
+          <!-- Nombre Paciente Column -->
+          <ng-container matColumnDef="nombrePaciente">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Paciente </th>
+            <td mat-cell *matCellDef="let element"> 
+              {{element.paciente.usuario.nombre}} {{element.paciente.usuario.apellido}}
+            </td>
+          </ng-container>
+
+          <!-- Documento Column -->
+          <ng-container matColumnDef="documento">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Documento </th>
+            <td mat-cell *matCellDef="let element"> 
+              {{element.paciente.usuario.documentoIdentidad}}
+            </td>
+          </ng-container>
+
+          <!-- Prioridad Column -->
+          <ng-container matColumnDef="prioridad">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Prioridad </th>
+            <td mat-cell *matCellDef="let element"> {{element.prioridad}} </td>
+          </ng-container>
+
+          <!-- Descripción Column -->
+          <ng-container matColumnDef="descripcion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Descripción </th>
+            <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
+          </ng-container>
+
+          <!-- Duración Column -->
+          <ng-container matColumnDef="duracionTratamiento">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Duración (días) </th>
+            <td mat-cell *matCellDef="let element"> {{element.duracionTratamiento}} </td>
+          </ng-container>
+
+          <!-- Acciones Column -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+            <td mat-cell *matCellDef="let element">
+              <button *ngIf="isMedico" mat-icon-button color="primary" (click)="editarRegistro(element)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              <div class="empty-state">
+                <mat-icon>info</mat-icon>
+                <p>No se encontraron sugerencias de cuidado</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Seleccionar página de sugerencias"></mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div> 

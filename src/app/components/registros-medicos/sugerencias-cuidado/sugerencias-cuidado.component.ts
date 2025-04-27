@@ -10,14 +10,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { RegistroDialogComponent } from './registro-dialog.component';
-import { HistorialClinicoService } from '../../../services/historial-clinico.service';
-import { HistorialClinico } from '../../../interfaces/registros-medicos.interface';
+import { SugerenciasCuidadoService } from '../../../services/sugerencias-cuidado.service';
+import { SugerenciaCuidado } from '../../../interfaces/registros-medicos.interface';
 import { ToastService } from '../../../services/toast.service';
 import { AuthContextService } from '../../../auth/auth-context.service';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-historial-clinico',
+  selector: 'app-sugerencias-cuidado',
   standalone: true,
   imports: [
     CommonModule,
@@ -30,21 +30,20 @@ import { Subscription } from 'rxjs';
     MatPaginatorModule,
     MatSortModule
   ],
-  templateUrl: './historial-clinico.component.html',
-  styleUrls: ['./historial-clinico.component.css']
+  templateUrl: './sugerencias-cuidado.component.html',
+  styleUrls: ['./sugerencias-cuidado.component.css']
 })
-export class HistorialClinicoComponent implements OnInit, OnDestroy {
+export class SugerenciasCuidadoComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = [
     'fechaRegistro',
     'nombrePaciente',
     'documento',
-    'diagnostico',
-    'tratamiento',
-    'observaciones',
-    'seguimientoRequerido',
+    'prioridad',
+    'descripcion',
+    'duracionTratamiento',
     'acciones'
   ];
-  dataSource: MatTableDataSource<HistorialClinico>;
+  dataSource: MatTableDataSource<SugerenciaCuidado>;
   isMedico: boolean = false;
   isPaciente: boolean = false;
   isFamiliar: boolean = false;
@@ -56,11 +55,11 @@ export class HistorialClinicoComponent implements OnInit, OnDestroy {
 
   constructor(
     private dialog: MatDialog,
-    private historialService: HistorialClinicoService,
+    private sugerenciasService: SugerenciasCuidadoService,
     private toastService: ToastService,
     private authContext: AuthContextService
   ) {
-    this.dataSource = new MatTableDataSource<HistorialClinico>([]);
+    this.dataSource = new MatTableDataSource<SugerenciaCuidado>([]);
   }
 
   ngOnInit() {
@@ -70,9 +69,9 @@ export class HistorialClinicoComponent implements OnInit, OnDestroy {
         this.isPaciente = user.tipoUsuario === 'Paciente';
         this.isFamiliar = user.tipoUsuario === 'Familiar';
         this.currentPatientId = user.idPaciente || null;
-        this.loadHistorialClinico();
+        this.loadSugerencias();
       } else {
-        this.toastService.showError('Debe iniciar sesión para ver el historial clínico');
+        this.toastService.showError('Debe iniciar sesión para ver las sugerencias de cuidado');
       }
     });
   }
@@ -105,26 +104,26 @@ export class HistorialClinicoComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadHistorialClinico();
+        this.loadSugerencias();
       }
     });
   }
 
-  editarRegistro(historial: HistorialClinico) {
+  editarRegistro(sugerencia: SugerenciaCuidado) {
     const dialogRef = this.dialog.open(RegistroDialogComponent, {
       width: '800px',
-      data: { historial }
+      data: { sugerencia }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadHistorialClinico();
+        this.loadSugerencias();
       }
     });
   }
 
-  loadHistorialClinico() {
-    this.historialService.obtenerTodos().subscribe({
+  loadSugerencias() {
+    this.sugerenciasService.obtenerTodos().subscribe({
       next: (data) => {
         // Filter data based on user type
         let filteredData = data;
@@ -138,12 +137,25 @@ export class HistorialClinicoComponent implements OnInit, OnDestroy {
           const dateB = b.fechaRegistro ? new Date(b.fechaRegistro).getTime() : 0;
           return dateB - dateA;
         });
+
+        // Set up filtering predicate
+        this.dataSource.filterPredicate = (data: SugerenciaCuidado, filter: string) => {
+          const searchStr = filter.toLowerCase();
+          return (
+            data.paciente?.usuario?.nombre?.toLowerCase().includes(searchStr) ||
+            data.paciente?.usuario?.apellido?.toLowerCase().includes(searchStr) ||
+            data.paciente?.usuario?.documentoIdentidad?.toLowerCase().includes(searchStr) ||
+            data.descripcion?.toLowerCase().includes(searchStr) ||
+            data.prioridad?.toLowerCase().includes(searchStr)
+          );
+        };
+
         this.dataSource.data = sortedData;
       },
       error: (error) => {
-        console.error('Error loading medical history:', error);
-        this.toastService.showError('Error al cargar el historial clínico');
+        console.error('Error loading care suggestions:', error);
+        this.toastService.showError('Error al cargar las sugerencias de cuidado');
       }
     });
   }
-}
+} 

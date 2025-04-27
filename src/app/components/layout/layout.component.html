@@ -23,6 +23,10 @@
     <mat-icon>favorite</mat-icon>
     <span>Signos Vitales</span>
   </a>
+  <a mat-button routerLink="/sugerencias-cuidado" routerLinkActive="active" (click)="closeMenu()">
+    <mat-icon>medical_services</mat-icon>
+    <span>Sugerencias de Cuidado</span>
+  </a>
   <a mat-button (click)="logout(); closeMenu()" class="logout-button">
     <mat-icon>logout</mat-icon>
     <span>Cerrar sesión</span>
@@ -40,12 +44,22 @@
         <span>Inicio</span>
       </a>
       <a mat-list-item routerLink="/historial-clinico" routerLinkActive="active">
-        <mat-icon>medical_services</mat-icon>
-        <span>Registrar Historial Clinico</span>
+        <div class="menu-item-content">
+          <mat-icon>medical_services</mat-icon>
+          <span>Registrar Historial Clinico</span>
+        </div>
       </a>
       <a mat-list-item routerLink="/signos-vitales" routerLinkActive="active">
-        <mat-icon>favorite</mat-icon>
-        <span>Signos Vitales</span>
+        <div class="menu-item-content">
+          <mat-icon>favorite</mat-icon>
+          <span>Signos Vitales</span>
+        </div>
+      </a>
+      <a mat-list-item routerLink="/sugerencias-cuidado" routerLinkActive="active">
+        <div class="menu-item-content">
+          <mat-icon>healing</mat-icon>
+          <span>Sugerencias de Cuidado</span>
+        </div>
       </a>
     </mat-nav-list>
     <div class="sidebar-footer">

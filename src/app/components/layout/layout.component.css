@@ -26,9 +26,26 @@
 }
 
 .sidenav .mat-list-item {
-  height: 48px;
-  margin: 4px 0;
-  cursor: pointer;
+  height: auto !important;
+  padding: 8px 16px;
+}
+
+.menu-item-content {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.menu-item-content mat-icon {
+  margin-right: 16px;
+  margin-top: 4px;
+}
+
+.menu-item-content span {
+  flex: 1;
+  white-space: normal;
+  line-height: 1.2;
+  padding: 4px 0;
 }
 
 .sidenav .mat-list-item.active {
@@ -36,7 +53,8 @@
 }
 
 .sidenav .mat-icon {
-  margin-right: 16px;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 .mat-toolbar {

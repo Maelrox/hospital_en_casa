@@ -67,11 +67,6 @@ textarea {
   min-height: 100px;
 }
 
-/* Add styles for the checkbox field */
-.form-field mat-checkbox {
-  margin-top: 1rem;
-}
-
 mat-dialog-content {
   max-height: 80vh;
   overflow-y: auto;
@@ -99,4 +94,4 @@ mat-dialog-actions {
   mat-dialog-actions {
     padding: 16px;
   }
-}
+} 

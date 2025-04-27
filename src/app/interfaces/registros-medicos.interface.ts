@@ -1,5 +1,3 @@
-import { Medico, Paciente } from "./usuario.interface";
-
 export interface HistorialClinico {
     idHistorial?: number;
     idPaciente: number;
@@ -30,14 +28,20 @@ export interface SignosVitales {
 } 
 
 export interface SugerenciaCuidado {
-    idSugerencia: number;
+    idSugerencia?: number;
     idPaciente: number;
     idMedico: number;
-    fechaRegistro: Date;
+    fechaRegistro: string;
     prioridad: string;
     descripcion: string;
     duracionTratamiento: number;
     activo: boolean;
-    paciente: Paciente;
-    medico: Medico;
+    nombrePaciente?: string;
+    paciente?: {
+        usuario: {
+            nombre: string;
+            apellido: string;
+            documentoIdentidad: string;
+        }
+    };
 } 

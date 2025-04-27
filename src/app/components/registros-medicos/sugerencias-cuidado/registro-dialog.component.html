@@ -1,0 +1,86 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Editar Sugerencia' : 'Nueva Sugerencia' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="form-container">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Paciente</mat-label>
+        <input type="hidden" formControlName="idPaciente">
+        
+        <!-- For médicos -->
+        <mat-select *ngIf="tipoRegistrador === 'Medico'" formControlName="idPaciente" required>
+          <div class="search-container">
+            <mat-icon class="search-icon">search</mat-icon>
+            <input class="search-input" 
+                   placeholder="Buscar paciente..." 
+                   (input)="filterPacientes()" 
+                   [(ngModel)]="searchTerm">
+          </div>
+          
+          <mat-option *ngFor="let paciente of filteredPacientes" [value]="paciente.idPaciente">
+            {{ paciente.usuario?.nombre }} - {{ paciente.usuario?.documentoIdentidad }}
+          </mat-option>
+          
+          <div *ngIf="filteredPacientes.length === 0" class="no-data-message">
+            <mat-icon>info</mat-icon>
+            <span>No se encontraron pacientes</span>
+          </div>
+        </mat-select>
+
+        <!-- For non-médicos -->
+        <input *ngIf="tipoRegistrador !== 'Medico'" 
+               matInput 
+               [value]="form.get('idPaciente')?.value" 
+               disabled>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Prioridad</mat-label>
+        <mat-select formControlName="prioridad" required>
+          <mat-option value="Alta">Alta</mat-option>
+          <mat-option value="Media">Media</mat-option>
+          <mat-option value="Baja">Baja</mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('prioridad')?.hasError('required')">
+          La prioridad es requerida
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="descripcion" required></textarea>
+        <mat-error *ngIf="form.get('descripcion')?.hasError('required')">
+          La descripción es requerida
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Duración del Tratamiento (días)</mat-label>
+        <input matInput type="number" formControlName="duracionTratamiento" required min="1">
+        <mat-error *ngIf="form.get('duracionTratamiento')?.hasError('required')">
+          La duración es requerida
+        </mat-error>
+        <mat-error *ngIf="form.get('duracionTratamiento')?.hasError('min')">
+          La duración debe ser mayor a 0
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-checkbox formControlName="activo">Activo</mat-checkbox>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!form.valid">
+    {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+  </button>
+</mat-dialog-actions> 

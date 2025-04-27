@@ -78,7 +78,7 @@ export class RegistroDialogComponent implements OnInit {
       presionArterialDiastolica: ['', [Validators.required, Validators.min(40), Validators.max(150)]],
       glicemia: ['', [Validators.required, Validators.min(50), Validators.max(500)]],
       tipoRegistrador: [this.tipoRegistrador, Validators.required],
-      idRegistrador: [currentUser?.idMedico || currentUser?.idPaciente || currentUser?.idFamiliar || '', Validators.required]
+      idRegistrador: [currentUser?.idUsuario || '', Validators.required]
     });
 
     // If editing, patch the form with existing values

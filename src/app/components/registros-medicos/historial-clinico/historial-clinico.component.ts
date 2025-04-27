@@ -142,7 +142,11 @@ export class HistorialClinicoComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading medical history:', error);
-        this.toastService.showError('Error al cargar el historial clínico');
+        if (error.status === 403 && this.isFamiliar) {
+          this.toastService.showError('No tienes permiso para ver el historial médico del paciente. Por favor, llama al centro de atención para más información.');
+        } else {
+          this.toastService.showError('Error al cargar el historial clínico');
+        }
       }
     });
   }

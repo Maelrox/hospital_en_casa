@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,7 +14,6 @@ import { SugerenciasCuidadoService } from '../../../services/sugerencias-cuidado
 import { SugerenciaCuidado } from '../../../interfaces/registros-medicos.interface';
 import { ToastService } from '../../../services/toast.service';
 import { AuthContextService } from '../../../auth/auth-context.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-sugerencias-cuidado',
@@ -33,13 +32,13 @@ import { Subscription } from 'rxjs';
   templateUrl: './sugerencias-cuidado.component.html',
   styleUrls: ['./sugerencias-cuidado.component.css']
 })
-export class SugerenciasCuidadoComponent implements OnInit, OnDestroy {
+export class SugerenciasCuidadoComponent implements OnInit {
   displayedColumns: string[] = [
     'fechaRegistro',
     'nombrePaciente',
     'documento',
-    'prioridad',
     'descripcion',
+    'prioridad',
     'duracionTratamiento',
     'acciones'
   ];
@@ -48,7 +47,6 @@ export class SugerenciasCuidadoComponent implements OnInit, OnDestroy {
   isPaciente: boolean = false;
   isFamiliar: boolean = false;
   currentPatientId: number | null = null;
-  private authSubscription: Subscription | null = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -60,25 +58,19 @@ export class SugerenciasCuidadoComponent implements OnInit, OnDestroy {
     private authContext: AuthContextService
   ) {
     this.dataSource = new MatTableDataSource<SugerenciaCuidado>([]);
+    this.dataSource.filterPredicate = this.createFilter();
   }
 
   ngOnInit() {
-    this.authSubscription = this.authContext.currentUser$.subscribe(user => {
-      if (user) {
-        this.isMedico = user.tipoUsuario === 'Medico';
-        this.isPaciente = user.tipoUsuario === 'Paciente';
-        this.isFamiliar = user.tipoUsuario === 'Familiar';
-        this.currentPatientId = user.idPaciente || null;
-        this.loadSugerencias();
-      } else {
-        this.toastService.showError('Debe iniciar sesión para ver las sugerencias de cuidado');
-      }
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
+    const currentUser = this.authContext.getCurrentUser();
+    if (currentUser) {
+      this.isMedico = currentUser.tipoUsuario === 'Medico';
+      this.isPaciente = currentUser.tipoUsuario === 'Paciente';
+      this.isFamiliar = currentUser.tipoUsuario === 'Familiar';
+      this.currentPatientId = currentUser.idPaciente || null;
+      this.loadSugerencias();
+    } else {
+      this.toastService.showError('Debe iniciar sesión para ver las sugerencias de cuidado');
     }
   }
 
@@ -94,6 +86,20 @@ export class SugerenciasCuidadoComponent implements OnInit, OnDestroy {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  private createFilter(): (data: SugerenciaCuidado, filter: string) => boolean {
+    return (data: SugerenciaCuidado, filter: string): boolean => {
+      const searchStr = filter.toLowerCase();
+      const paciente = data.paciente;
+      return (
+        (paciente?.usuario?.nombre || '').toLowerCase().includes(searchStr) ||
+        (paciente?.usuario?.apellido || '').toLowerCase().includes(searchStr) ||
+        (paciente?.usuario?.documentoIdentidad || '').toLowerCase().includes(searchStr) ||
+        (data.descripcion || '').toLowerCase().includes(searchStr) ||
+        (data.prioridad || '').toLowerCase().includes(searchStr)
+      );
+    };
   }
 
   nuevoRegistro() {
@@ -137,23 +143,10 @@ export class SugerenciasCuidadoComponent implements OnInit, OnDestroy {
           const dateB = b.fechaRegistro ? new Date(b.fechaRegistro).getTime() : 0;
           return dateB - dateA;
         });
-
-        // Set up filtering predicate
-        this.dataSource.filterPredicate = (data: SugerenciaCuidado, filter: string) => {
-          const searchStr = filter.toLowerCase();
-          return (
-            data.paciente?.usuario?.nombre?.toLowerCase().includes(searchStr) ||
-            data.paciente?.usuario?.apellido?.toLowerCase().includes(searchStr) ||
-            data.paciente?.usuario?.documentoIdentidad?.toLowerCase().includes(searchStr) ||
-            data.descripcion?.toLowerCase().includes(searchStr) ||
-            data.prioridad?.toLowerCase().includes(searchStr)
-          );
-        };
-
         this.dataSource.data = sortedData;
       },
       error: (error) => {
-        console.error('Error loading care suggestions:', error);
+        console.error('Error loading suggestions:', error);
         this.toastService.showError('Error al cargar las sugerencias de cuidado');
       }
     });

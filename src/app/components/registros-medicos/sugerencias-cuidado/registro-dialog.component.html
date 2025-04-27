@@ -8,17 +8,20 @@
         <input type="hidden" formControlName="idPaciente">
         
         <!-- For médicos -->
-        <mat-select *ngIf="tipoRegistrador === 'Medico'" formControlName="idPaciente" required>
+        <mat-select *ngIf="tipoRegistrador === 'medico'" formControlName="idPaciente" required>
           <div class="search-container">
             <mat-icon class="search-icon">search</mat-icon>
             <input class="search-input" 
                    placeholder="Buscar paciente..." 
                    (input)="filterPacientes()" 
-                   [(ngModel)]="searchTerm">
+                   (keydown)="$event.stopPropagation()"
+                   [formControl]="searchControl">
           </div>
           
-          <mat-option *ngFor="let paciente of filteredPacientes" [value]="paciente.idPaciente">
-            {{ paciente.usuario?.nombre }} - {{ paciente.usuario?.documentoIdentidad }}
+          <mat-option *ngFor="let paciente of filteredPacientes" 
+                     [value]="paciente.idPaciente"
+                     (click)="onPacienteSelected(paciente)">
+            {{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellido }} - {{ paciente.usuario?.documentoIdentidad }}
           </mat-option>
           
           <div *ngIf="filteredPacientes.length === 0" class="no-data-message">

@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -15,6 +15,7 @@ import { ToastService } from '../../../services/toast.service';
 import { AuthContextService } from '../../../auth/auth-context.service';
 import { PacienteService } from '../../../services/paciente.service';
 import { Paciente } from '../../../interfaces/paciente.interface';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-registro-dialog',
@@ -42,7 +43,7 @@ export class RegistroDialogComponent implements OnInit {
   tipoRegistrador: string = '';
   pacientes: Paciente[] = [];
   filteredPacientes: Paciente[] = [];
-  searchTerm: string = '';
+  searchControl = new FormControl('');
 
   constructor(
     private fb: FormBuilder,
@@ -53,8 +54,11 @@ export class RegistroDialogComponent implements OnInit {
     private authContext: AuthContextService,
     private pacientesService: PacienteService
   ) {
+    const currentUser = this.authContext.getCurrentUser();
+    this.tipoRegistrador = currentUser?.tipoUsuario?.toLowerCase() || '';
+    
     this.form = this.fb.group({
-      idPaciente: ['', Validators.required],
+      idPaciente: [{ value: '', disabled: this.tipoRegistrador !== 'medico' }, Validators.required],
       descripcion: ['', Validators.required],
       prioridad: ['', Validators.required],
       duracionTratamiento: ['', [Validators.required, Validators.min(1)]],
@@ -65,52 +69,81 @@ export class RegistroDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.authContext.currentUser$.subscribe(user => {
-      if (user) {
-        this.tipoRegistrador = user.tipoUsuario;
-        
-        if (this.tipoRegistrador !== 'Medico') {
-          // For non-medicos, set the patient ID and disable the field
-          this.form.patchValue({
-            idPaciente: user.idPaciente
-          });
-          this.form.get('idPaciente')?.disable();
-        } else {
-          // For medicos, load all patients
-          this.loadPacientes();
-        }
+    console.log(this.tipoRegistrador);
+    if (this.tipoRegistrador === 'medico') {
+      this.loadPacientes();
+      this.searchControl.valueChanges.subscribe(value => {
+        this.filterPacientes();
+      });
+    } else {
+      const patientId = this.authContext.getCurrentUser()?.idPaciente;
+      if (patientId) {
+        this.pacientesService.getPacientes().subscribe({
+          next: (pacientes: Paciente[]) => {
+            const paciente = pacientes.find(p => p.idPaciente === patientId);
+            if (paciente) {
+              this.pacientes = [paciente];
+              this.filteredPacientes = [paciente];
+              this.form.patchValue({
+                idPaciente: patientId
+              });
+            }
+          },
+          error: (error: any) => {
+            console.error('Error loading patient:', error);
+            this.toastService.showError('Error al cargar los datos del paciente');
+          }
+        });
       }
-    });
+    }
 
     if (this.isEditMode && this.data.sugerencia) {
       this.form.patchValue(this.data.sugerencia);
     }
   }
 
-  loadPacientes() {
-    this.pacientesService.getPacientes().subscribe({
-      next: (data: Paciente[]) => {
-        this.pacientes = data;
-        this.filteredPacientes = [...data];
-      },
-      error: (error: any) => {
-        console.error('Error loading patients:', error);
-        this.toastService.showError('Error al cargar los pacientes');
-      }
-    });
+  async loadPacientes() {
+    try {
+      const pacientes = await firstValueFrom(this.pacientesService.getPacientes()) || [];
+      this.pacientes = pacientes;
+      this.filteredPacientes = [...pacientes].sort((a, b) => {
+        const nameA = this.normalizeString(`${a.usuario?.nombre || ''} ${a.usuario?.apellido || ''}`);
+        const nameB = this.normalizeString(`${b.usuario?.nombre || ''} ${b.usuario?.apellido || ''}`);
+        return nameA.localeCompare(nameB);
+      });
+    } catch (error) {
+      console.error('Error loading patients:', error);
+      this.toastService.showError('Error al cargar los pacientes');
+    }
+  }
+
+  private normalizeString(str: string): string {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   }
 
   filterPacientes() {
-    if (!this.searchTerm) {
-      this.filteredPacientes = [...this.pacientes];
+    const term = this.normalizeString(this.searchControl.value || '');
+    if (!term) {
+      this.filteredPacientes = [...this.pacientes].sort((a, b) => {
+        const nameA = this.normalizeString(`${a.usuario?.nombre || ''} ${a.usuario?.apellido || ''}`);
+        const nameB = this.normalizeString(`${b.usuario?.nombre || ''} ${b.usuario?.apellido || ''}`);
+        return nameA.localeCompare(nameB);
+      });
       return;
     }
 
-    const searchLower = this.searchTerm.toLowerCase();
-    this.filteredPacientes = this.pacientes.filter(paciente =>
-      paciente.usuario?.nombre?.toLowerCase().includes(searchLower) ||
-      paciente.usuario?.documentoIdentidad?.toLowerCase().includes(searchLower)
-    );
+    this.filteredPacientes = this.pacientes.filter(paciente => {
+      const nombreCompleto = this.normalizeString(`${paciente.usuario?.nombre || ''} ${paciente.usuario?.apellido || ''}`);
+      const documento = this.normalizeString(paciente.usuario?.documentoIdentidad || '');
+      return nombreCompleto.includes(term) || documento.includes(term);
+    }).sort((a, b) => {
+      const nameA = this.normalizeString(`${a.usuario?.nombre || ''} ${a.usuario?.apellido || ''}`);
+      const nameB = this.normalizeString(`${b.usuario?.nombre || ''} ${b.usuario?.apellido || ''}`);
+      return nameA.localeCompare(nameB);
+    });
   }
 
   onSubmit() {
@@ -152,5 +185,11 @@ export class RegistroDialogComponent implements OnInit {
 
   onCancel() {
     this.dialogRef.close();
+  }
+
+  onPacienteSelected(paciente: Paciente) {
+    this.form.patchValue({
+      idPaciente: paciente.idPaciente
+    });
   }
 } 

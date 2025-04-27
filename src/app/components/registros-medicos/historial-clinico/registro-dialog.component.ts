@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -32,6 +32,7 @@ import { ToastService } from '../../../services/toast.service';
     MatSelectModule,
     MatCheckboxModule
   ],
+  providers: [DatePipe],
   templateUrl: './registro-dialog.component.html',
   styleUrls: ['./registro-dialog.component.css']
 })
@@ -50,7 +51,8 @@ export class HistorialDialogComponent implements OnInit {
     private pacienteService: PacienteService,
     private authContext: AuthContextService,
     private historialService: HistorialClinicoService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private datePipe: DatePipe
   ) {
     const currentUser = this.authContext.getCurrentUser();
     this.registroForm = this.fb.group({
@@ -107,9 +109,13 @@ export class HistorialDialogComponent implements OnInit {
 
   onSubmit() {
     if (this.registroForm.valid) {
+      const now = new Date();
+      const offset = now.getTimezoneOffset();
+      const localDate = new Date(now.getTime() - (offset * 60 * 1000));
+      
       const historial: HistorialClinico = {
         ...this.registroForm.value,
-        fechaRegistro: new Date()
+        fechaRegistro: localDate.toISOString().slice(0, -1) // Remove the 'Z' suffix
       };
 
       this.historialService.crear(historial).subscribe({

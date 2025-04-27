@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
@@ -16,9 +16,12 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
-import { RegistrosMedicosService } from '../../../services/registros-medicos.service';
+import { SignosVitalesService } from '../../../services/signos-vitales.service';
 import { SignosVitales } from '../../../interfaces/registros-medicos.interface';
 import { RegistroDialogComponent } from './registro-dialog.component';
+import { ToastService } from '../../../services/toast.service';
+import { AuthContextService } from '../../../auth/auth-context.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-signos-vitales',
@@ -40,50 +43,78 @@ import { RegistroDialogComponent } from './registro-dialog.component';
   templateUrl: './signos-vitales.component.html',
   styleUrls: ['./signos-vitales.component.css']
 })
-export class SignosVitalesComponent {
+export class SignosVitalesComponent implements OnInit, OnDestroy {
   formulario: FormGroup;
   errorMensaje: string = '';
+  signosVitales: SignosVitales[] = [];
+  isMedico: boolean = false;
+  isPaciente: boolean = false;
+  currentPatientId: number | null = null;
+  private authSubscription: Subscription | null = null;
 
   // Configuración de la tabla
   displayedColumns: string[] = [
-    'fecha',
-    'id_paciente',
-    'nombre_paciente',
+    'fechaRegistro',
+    'idPaciente',
+    'nombrePaciente',
+    'apellidoPaciente',
     'documento',
     'oximetria',
-    'frecuencia_respiratoria',
-    'frecuencia_cardiaca',
+    'frecuenciaRespiratoria',
+    'frecuenciaCardiaca',
     'temperatura',
-    'presion_arterial',
+    'presionArterialSistolica',
+    'presionArterialDiastolica',
     'glicemia',
-    'registrador'
+    'tipoRegistrador',
+    'acciones'
   ];
 
-  dataSource: MatTableDataSource<any>;
+  dataSource: MatTableDataSource<SignosVitales>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private fb: FormBuilder,
-    private registrosMedicosService: RegistrosMedicosService,
-    private dialog: MatDialog
+    private signosVitalesService: SignosVitalesService,
+    private dialog: MatDialog,
+    private toastService: ToastService,
+    private authContext: AuthContextService
   ) {
     this.formulario = this.fb.group({
-      id_paciente: ['', Validators.required],
+      idPaciente: ['', Validators.required],
       oximetria: ['', [Validators.required, Validators.min(0), Validators.max(100)]],
-      frecuencia_respiratoria: ['', Validators.required],
-      frecuencia_cardiaca: ['', Validators.required],
+      frecuenciaRespiratoria: ['', Validators.required],
+      frecuenciaCardiaca: ['', Validators.required],
       temperatura: ['', Validators.required],
-      presion_arterial_sistolica: ['', Validators.required],
-      presion_arterial_diastolica: ['', Validators.required],
+      presionArterialSistolica: ['', Validators.required],
+      presionArterialDiastolica: ['', Validators.required],
       glicemia: ['', Validators.required],
-      tipo_registrador: ['', Validators.required],
-      id_registrador: ['', Validators.required]
+      tipoRegistrador: ['', Validators.required],
+      idRegistrador: ['', Validators.required]
     });
 
-    // Inicializar la fuente de datos de la tabla
-    this.dataSource = new MatTableDataSource(this.signosVitales);
+    this.dataSource = new MatTableDataSource<SignosVitales>([]);
+  }
+
+  ngOnInit() {
+    this.authSubscription = this.authContext.currentUser$.subscribe(user => {
+      if (user) {
+        this.isMedico = user.tipoUsuario === 'Médico';
+        this.isPaciente = user.tipoUsuario === 'Paciente';
+        this.currentPatientId = user.idPaciente || null;
+        this.loadSignosVitales();
+      } else {
+        this.toastService.showError('Debe iniciar sesión para ver los signos vitales');
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
   }
 
   ngAfterViewInit() {
@@ -100,88 +131,65 @@ export class SignosVitalesComponent {
     }
   }
 
-  onSubmit() {
-    if (this.formulario.valid) {
-      // TODO: Implementar la lógica de envío
-      const nuevoRegistro = {
-        ...this.formulario.value,
-        fecha_registro: new Date()
-      };
+  loadSignosVitales() {
+    this.signosVitalesService.obtenerTodos().subscribe({
+      next: (data) => {
+        // Filter data based on user type
+        let filteredData = data;
+        if (this.isPaciente && this.currentPatientId) {
+          filteredData = data.filter(record => record.idPaciente === this.currentPatientId);
+        }
 
-      this.signosVitales.unshift(nuevoRegistro);
-      this.dataSource.data = this.signosVitales;
-      this.formulario.reset();
-    }
-  }
-
-  openRegistroDialog(): void {
-    const dialogRef = this.dialog.open(RegistroDialogComponent, {
-      width: '600px'
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.dataSource.data = [...this.dataSource.data, result];
+        // Sort by fechaRegistro in descending order
+        const sortedData = [...filteredData].sort((a, b) => {
+          const dateA = a.fechaRegistro ? new Date(a.fechaRegistro).getTime() : 0;
+          const dateB = b.fechaRegistro ? new Date(b.fechaRegistro).getTime() : 0;
+          return dateB - dateA;
+        });
+        this.dataSource.data = sortedData;
+      },
+      error: (error) => {
+        console.error('Error loading vital signs:', error);
+        this.toastService.showError('Error al cargar los signos vitales');
       }
     });
   }
 
-  signosVitales = [
-    {
-      fecha_registro: new Date('2024-03-15T10:30:00'),
-      nombre_paciente: 'Juan Pérez',
-      documento: '1234567890',
-      id_paciente: 1,
-      oximetria: 98,
-      frecuencia_respiratoria: 16,
-      frecuencia_cardiaca: 72,
-      temperatura: 36.5,
-      presion_arterial_sistolica: 120,
-      presion_arterial_diastolica: 80,
-      glicemia: 90,
-      tipo_registrador: 'medico'
-    },
-    {
-      fecha_registro: new Date('2024-03-15T11:45:00'),
-      nombre_paciente: 'María García',
-      documento: '9876543210',
-      id_paciente: 2,
-      oximetria: 95,
-      frecuencia_respiratoria: 18,
-      frecuencia_cardiaca: 85,
-      temperatura: 37.2,
-      presion_arterial_sistolica: 130,
-      presion_arterial_diastolica: 85,
-      glicemia: 110,
-      tipo_registrador: 'enfermero'
-    },
-    {
-      fecha_registro: new Date('2024-03-15T14:20:00'),
-      nombre_paciente: 'Carlos López',
-      documento: '4567891230',
-      id_paciente: 3,
-      oximetria: 99,
-      frecuencia_respiratoria: 14,
-      frecuencia_cardiaca: 68,
-      temperatura: 36.8,
-      presion_arterial_sistolica: 115,
-      presion_arterial_diastolica: 75,
-      glicemia: 95,
-      tipo_registrador: 'medico'
-    },
-    {
-      fecha_registro: new Date('2024-03-15T16:00:00'),
-      nombre_paciente: 'Ana Martínez',
-      documento: '7891234560',
-      id_paciente: 4,
-      oximetria: 97,
-      frecuencia_respiratoria: 20,
-      frecuencia_cardiaca: 92,
-      temperatura: 37.5,
-      presion_arterial_sistolica: 140,
-      presion_arterial_diastolica: 90,
-      glicemia: 120,
-      tipo_registrador: 'familiar'
+  openRegistroDialog(signosVitales?: SignosVitales): void {
+    const dialogRef = this.dialog.open(RegistroDialogComponent, {
+      width: '600px',
+      data: { signosVitales }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadSignosVitales();
+      }
+    });
+  }
+
+  editarRegistro(signosVitales: SignosVitales) {
+    if (!this.isMedico) {
+      this.toastService.showError('Función solo disponible para médicos');
+      return;
     }
-  ];
+    this.openRegistroDialog(signosVitales);
+  }
+
+  eliminarRegistro(id: number) {
+    if (!this.isMedico) {
+      this.toastService.showError('Función solo disponible para médicos');
+      return;
+    }
+    this.signosVitalesService.eliminar(id).subscribe({
+      next: () => {
+        this.toastService.showSuccess('Registro eliminado correctamente');
+        this.loadSignosVitales();
+      },
+      error: (error) => {
+        console.error('Error deleting vital signs:', error);
+        this.toastService.showError('Error al eliminar el registro');
+      }
+    });
+  }
 }

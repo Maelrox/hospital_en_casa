@@ -1,0 +1,79 @@
+.container {
+  padding: 20px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.search-field {
+  width: 300px;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-column-acciones {
+  width: 100px;
+  text-align: center;
+}
+
+.mat-column-fechaRegistro {
+  width: 180px;
+}
+
+.mat-column-idPaciente {
+  width: 100px;
+}
+
+.mat-column-nombrePaciente {
+  width: 200px;
+}
+
+.mat-column-documento {
+  width: 150px;
+}
+
+.mat-column-oximetria,
+.mat-column-frecuenciaRespiratoria,
+.mat-column-frecuenciaCardiaca,
+.mat-column-temperatura,
+.mat-column-presionArterialSistolica,
+.mat-column-presionArterialDiastolica,
+.mat-column-glicemia {
+  width: 120px;
+  text-align: right;
+}
+
+.mat-column-tipoRegistrador {
+  width: 150px;
+}
+
+.mat-mdc-row .mat-mdc-cell {
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+  cursor: pointer;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+  border-color: currentColor;
+}
+
+.demo-row-is-clicked {
+  font-weight: bold;
+}
+  

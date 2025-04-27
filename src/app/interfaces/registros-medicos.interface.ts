@@ -23,7 +23,10 @@ export interface SignosVitales {
     presionArterialDiastolica?: number;
     glicemia?: number;
     idRegistrador: number;
-    tipoRegistrador: 'medico' | 'familiar' | 'paciente';
+    tipoRegistrador: 'médico' | 'familiar' | 'paciente';
+    nombrePaciente?: string;
+    apellidoPaciente?: string;
+    documento?: string;
 } 
 
 export interface SugerenciaCuidado {

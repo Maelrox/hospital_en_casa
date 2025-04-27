@@ -39,7 +39,7 @@ export const MY_DATE_FORMATS = {
   selector: 'app-registro-dialog',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     ReactiveFormsModule,
     FormsModule,
     MatDialogModule,
@@ -71,7 +71,7 @@ export class RegistroDialogComponent implements OnInit {
 
   tiposUsuario = [
     { value: 'Paciente', viewValue: 'Paciente' },
-    { value: 'Médico', viewValue: 'Médico' },
+    { value: 'Medico', viewValue: 'Medico' },
     { value: 'Familiar', viewValue: 'Familiar' },
   ];
 
@@ -131,16 +131,16 @@ export class RegistroDialogComponent implements OnInit {
   filterPacientes() {
     const term = this.pacienteSearchTerm.toLowerCase();
     const pacientes = this.pacientesSubject.value;
-    
+
     let filtered = pacientes;
     if (term) {
       filtered = pacientes.filter(paciente =>
-        (paciente.usuario?.nombre?.toLowerCase().includes(term) ||
+      (paciente.usuario?.nombre?.toLowerCase().includes(term) ||
         paciente.usuario?.apellido?.toLowerCase().includes(term) ||
         paciente.usuario?.documentoIdentidad?.toLowerCase().includes(term))
       );
     }
-    
+
     this.filteredPacientes = filtered.sort((a, b) => {
       const nameA = `${a.usuario?.nombre || ''} ${a.usuario?.apellido || ''}`.toLowerCase();
       const nameB = `${b.usuario?.nombre || ''} ${b.usuario?.apellido || ''}`.toLowerCase();
@@ -163,7 +163,7 @@ export class RegistroDialogComponent implements OnInit {
   }
 
   get isMedico(): boolean {
-    return this.registroForm.get('tipoUsuario')?.value === 'Médico';
+    return this.registroForm.get('tipoUsuario')?.value === 'Medico';
   }
 
   get isFamiliar(): boolean {
@@ -210,7 +210,7 @@ export class RegistroDialogComponent implements OnInit {
                 this.errorMessage = 'Error al registrar la información del paciente';
               }
             });
-          } else if (tipoUsuario === 'Médico' && usuario) {
+          } else if (tipoUsuario === 'Medico' && usuario) {
             const medicoData: Medico = {
               idMedico: 0,
               idUsuario: usuario.idUsuario!,
@@ -254,8 +254,12 @@ export class RegistroDialogComponent implements OnInit {
           }
         },
         error: (error) => {
-          this.errorMessage = 'Error al registrar el usuario';
           console.error('Registration error:', error);
+          if (error.error && error.error.error) {
+            this.toastService.showError(error.error.error);
+          } else {
+            this.toastService.showError('Error del servidor. Por favor, intente nuevamente más tarde.');
+          }
         }
       });
     }
@@ -266,7 +270,6 @@ export class RegistroDialogComponent implements OnInit {
   }
 
   private updateValidationForUserType(tipoUsuario: string) {
-    // Reset all validators first
     const controls = this.registroForm.controls;
     Object.keys(controls).forEach(key => {
       if (key !== 'tipoUsuario') {
@@ -275,7 +278,6 @@ export class RegistroDialogComponent implements OnInit {
       }
     });
 
-    // Set base validators for all users
     controls['nombre'].setValidators([Validators.required, Validators.maxLength(100)]);
     controls['apellido'].setValidators([Validators.required, Validators.maxLength(100)]);
     controls['documentoIdentidad'].setValidators([Validators.required, Validators.maxLength(20)]);
@@ -284,15 +286,17 @@ export class RegistroDialogComponent implements OnInit {
     controls['contraseña'].setValidators([Validators.required, Validators.minLength(6)]);
     controls['confirmarContraseña'].setValidators([Validators.required]);
 
-    // Add specific validators based on user type
     if (tipoUsuario === 'Paciente') {
-      controls['fechaNacimiento'].setValidators([Validators.required]);
+      controls['fechaNacimiento'].setValidators([
+        Validators.required,
+        this.minimumAgeValidator(1)
+      ]);
       controls['sexo'].setValidators([Validators.required]);
       controls['direccionResidencia'].setValidators([Validators.required]);
       controls['contactoEmergencia'].setValidators([Validators.required]);
       controls['parentescoContacto'].setValidators([Validators.required]);
       controls['telefonoEmergencia'].setValidators([Validators.required]);
-    } else if (tipoUsuario === 'Médico') {
+    } else if (tipoUsuario === 'Medico') {
       controls['especialidad'].setValidators([Validators.required]);
       controls['numeroLicencia'].setValidators([Validators.required]);
       controls['registroProfesional'].setValidators([Validators.required]);
@@ -303,10 +307,23 @@ export class RegistroDialogComponent implements OnInit {
       controls['autorizadoRegistroSignos'].setValidators([Validators.required]);
     }
 
-    // Update all controls
     Object.keys(controls).forEach(key => {
       controls[key].updateValueAndValidity();
     });
+  }
+
+  minimumAgeValidator(minAge: number) {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      if (!control.value) {
+        return null;
+      }
+
+      const birthDate = new Date(control.value);
+      const today = new Date();
+      const ageInDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      return ageInDays >= minAge ? null : { 'minimumAge': { requiredAge: minAge, actualAge: ageInDays } };
+    };
   }
 
   formatDateToUTC(date: Date): string {

@@ -13,3 +13,16 @@
 .search-field {
   width: 300px;
 }
+
+.no-data-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.no-data-message mat-icon {
+  color: rgba(0, 0, 0, 0.4);
+}

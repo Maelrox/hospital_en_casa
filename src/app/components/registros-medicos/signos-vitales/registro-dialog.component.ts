@@ -18,6 +18,7 @@ import { AuthContextService } from '../../../auth/auth-context.service';
 import { SignosVitalesService } from '../../../services/signos-vitales.service';
 import { SignosVitales } from '../../../interfaces/registros-medicos.interface';
 import { ToastService } from '../../../services/toast.service';
+import { Familiar } from '../../../interfaces/familiar.interface';
 
 @Component({
   selector: 'app-registro-dialog',
@@ -58,8 +59,17 @@ export class RegistroDialogComponent implements OnInit {
     const currentUser = this.authContext.getCurrentUser();
     this.tipoRegistrador = currentUser?.tipoUsuario?.toLowerCase() || '';
     
+    // Get the patient ID based on user type
+    let patientId: number | null = null;
+    if (this.tipoRegistrador === 'paciente') {
+      patientId = currentUser?.idPaciente || null;
+    } else if (this.tipoRegistrador === 'familiar') {
+      patientId = currentUser?.idPaciente || null;
+    }
+    
     this.registroForm = this.fb.group({
-      idPaciente: ['', Validators.required],
+      idPaciente: [{ value: patientId || '', disabled: this.tipoRegistrador !== 'medico' }, 
+        this.tipoRegistrador === 'medico' ? Validators.required : []],
       oximetria: ['', [Validators.required, Validators.min(70), Validators.max(100)]],
       frecuenciaRespiratoria: ['', [Validators.required, Validators.min(8), Validators.max(60)]],
       frecuenciaCardiaca: ['', [Validators.required, Validators.min(40), Validators.max(200)]],
@@ -68,12 +78,43 @@ export class RegistroDialogComponent implements OnInit {
       presionArterialDiastolica: ['', [Validators.required, Validators.min(40), Validators.max(150)]],
       glicemia: ['', [Validators.required, Validators.min(50), Validators.max(500)]],
       tipoRegistrador: [this.tipoRegistrador, Validators.required],
-      idRegistrador: [currentUser?.idMedico || '', Validators.required]
+      idRegistrador: [currentUser?.idMedico || currentUser?.idPaciente || currentUser?.idFamiliar || '', Validators.required]
     });
+
+    // If editing, patch the form with existing values
+    if (this.data.signosVitales) {
+      this.registroForm.patchValue(this.data.signosVitales);
+    } else if (patientId) {
+      // Ensure patientId is set for non-medico users
+      this.registroForm.patchValue({ idPaciente: patientId });
+    }
   }
 
   ngOnInit() {
-    this.loadPacientes();
+    if (this.tipoRegistrador === 'medico') {
+      this.loadPacientes();
+    } else {
+      const currentUser = this.authContext.getCurrentUser();
+      const patientId = this.tipoRegistrador === 'paciente' 
+        ? currentUser?.idPaciente 
+        : (currentUser as unknown as Familiar)?.paciente?.idPaciente;
+
+      if (patientId) {
+        this.pacienteService.getPacientes().subscribe({
+          next: (pacientes: Paciente[]) => {
+            const paciente = pacientes.find(p => p.idPaciente === patientId);
+            if (paciente) {
+              this.pacientesSubject.next([paciente]);
+              this.filteredPacientes = [paciente];
+            }
+          },
+          error: (error: any) => {
+            console.error('Error loading patient:', error);
+            this.toastService.showError('Error al cargar los datos del paciente');
+          }
+        });
+      }
+    }
   }
 
   async loadPacientes() {
@@ -137,8 +178,10 @@ export class RegistroDialogComponent implements OnInit {
       const offset = now.getTimezoneOffset();
       const localDate = new Date(now.getTime() - (offset * 60 * 1000));
       
+      // Get the form value and ensure idPaciente is included
+      const formValue = this.registroForm.getRawValue();
       const signosVitales: SignosVitales = {
-        ...this.registroForm.value,
+        ...formValue,
         fechaRegistro: localDate.toISOString().slice(0, -1)
       };
 
@@ -151,7 +194,8 @@ export class RegistroDialogComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error updating vital signs:', error);
-            this.toastService.showError('Error al actualizar el registro');
+            const errorMessage = error.error?.error || 'Error al actualizar el registro';
+            this.toastService.showError(errorMessage);
           }
         });
       } else {
@@ -163,10 +207,16 @@ export class RegistroDialogComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error creating vital signs:', error);
-            this.toastService.showError('Error al crear el registro');
+            const errorMessage = error.error?.error || 'Error al crear el registro';
+            this.toastService.showError(errorMessage);
           }
         });
       }
     }
+  }
+
+  get pacienteNombre(): string {
+    const paciente = this.filteredPacientes[0];
+    return paciente?.usuario ? `${paciente.usuario.nombre} ${paciente.usuario.apellido}` : '';
   }
 } 

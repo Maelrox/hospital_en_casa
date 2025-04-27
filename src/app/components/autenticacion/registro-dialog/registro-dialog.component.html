@@ -40,6 +40,9 @@
             <mat-error *ngIf="registroForm.get('documentoIdentidad')?.hasError('required')">
               El documento de identidad es requerido
             </mat-error>
+            <mat-error *ngIf="registroForm.get('documentoIdentidad')?.hasError('duplicate')">
+              El documento de identidad ya está registrado
+            </mat-error>
           </mat-form-field>
         </div>
       </div>
@@ -127,13 +130,16 @@
         <div class="form-section">
           <h3 class="form-section-title">Información del Paciente</h3>
           <div class="form-row">
-            <mat-form-field class="full-width" appearance="outline">
+            <mat-form-field appearance="outline" class="form-field">
               <mat-label>Fecha de Nacimiento</mat-label>
               <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento">
               <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
               <mat-error *ngIf="registroForm.get('fechaNacimiento')?.hasError('required')">
                 La fecha de nacimiento es requerida
+              </mat-error>
+              <mat-error *ngIf="registroForm.get('fechaNacimiento')?.hasError('minimumAge')">
+                La fecha de nacimiento debe ser al menos de 24 horas atrás
               </mat-error>
             </mat-form-field>
 

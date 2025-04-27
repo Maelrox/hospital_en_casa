@@ -1,6 +1,6 @@
 export interface Usuario {
     idUsuario?: number;
-    tipoUsuario: 'Paciente' | 'Médico' | 'Paciente' | 'Familiar';
+    tipoUsuario: 'Paciente' | 'Medico' | 'Paciente' | 'Familiar';
     nombre: string;
     apellido: string;
     documentoIdentidad: string | null;

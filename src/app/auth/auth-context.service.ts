@@ -72,9 +72,11 @@ export class AuthContextService {
 
   getToken(): string | null {
     const token = this.tokenSubject.value;
+    console.log('Token from subject:', token);
     if (!token) {
       // Try to get from localStorage as fallback
       const storedUser = localStorage.getItem('currentUser');
+      console.log('Stored user from localStorage:', storedUser);
       if (storedUser) {
         const user = JSON.parse(storedUser);
         return user.token;

@@ -47,6 +47,7 @@ export class HistorialClinicoComponent implements OnInit, OnDestroy {
   dataSource: MatTableDataSource<HistorialClinico>;
   isMedico: boolean = false;
   isPaciente: boolean = false;
+  isFamiliar: boolean = false;
   currentPatientId: number | null = null;
   private authSubscription: Subscription | null = null;
 
@@ -65,8 +66,9 @@ export class HistorialClinicoComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.authSubscription = this.authContext.currentUser$.subscribe(user => {
       if (user) {
-        this.isMedico = user.tipoUsuario === 'Médico';
+        this.isMedico = user.tipoUsuario === 'Medico';
         this.isPaciente = user.tipoUsuario === 'Paciente';
+        this.isFamiliar = user.tipoUsuario === 'Familiar';
         this.currentPatientId = user.idPaciente || null;
         this.loadHistorialClinico();
       } else {
@@ -125,8 +127,7 @@ export class HistorialClinicoComponent implements OnInit, OnDestroy {
       next: (data) => {
         // Filter data based on user type
         let filteredData = data;
-        console.log(this.currentPatientId);
-        if (this.isPaciente && this.currentPatientId) {
+        if ((this.isPaciente || this.isFamiliar) && this.currentPatientId) {
           filteredData = data.filter(record => record.idPaciente === this.currentPatientId);
         }
 

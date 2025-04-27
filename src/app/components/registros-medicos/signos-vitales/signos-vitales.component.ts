@@ -49,6 +49,7 @@ export class SignosVitalesComponent implements OnInit, OnDestroy {
   signosVitales: SignosVitales[] = [];
   isMedico: boolean = false;
   isPaciente: boolean = false;
+  isFamiliar: boolean = false;
   currentPatientId: number | null = null;
   private authSubscription: Subscription | null = null;
 
@@ -101,8 +102,9 @@ export class SignosVitalesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.authSubscription = this.authContext.currentUser$.subscribe(user => {
       if (user) {
-        this.isMedico = user.tipoUsuario === 'Médico';
+        this.isMedico = user.tipoUsuario === 'Medico';
         this.isPaciente = user.tipoUsuario === 'Paciente';
+        this.isFamiliar = user.tipoUsuario === 'Familiar';
         this.currentPatientId = user.idPaciente || null;
         this.loadSignosVitales();
       } else {
@@ -136,7 +138,7 @@ export class SignosVitalesComponent implements OnInit, OnDestroy {
       next: (data) => {
         // Filter data based on user type
         let filteredData = data;
-        if (this.isPaciente && this.currentPatientId) {
+        if ((this.isPaciente || this.isFamiliar) && this.currentPatientId) {
           filteredData = data.filter(record => record.idPaciente === this.currentPatientId);
         }
 
@@ -156,6 +158,10 @@ export class SignosVitalesComponent implements OnInit, OnDestroy {
   }
 
   openRegistroDialog(signosVitales?: SignosVitales): void {
+    if (!this.isMedico && !this.isFamiliar && !this.isPaciente) {
+      this.toastService.showError('Función solo disponible para médicos y familiares autorizados');
+      return;
+    }
     const dialogRef = this.dialog.open(RegistroDialogComponent, {
       width: '600px',
       data: { signosVitales }
@@ -169,8 +175,8 @@ export class SignosVitalesComponent implements OnInit, OnDestroy {
   }
 
   editarRegistro(signosVitales: SignosVitales) {
-    if (!this.isMedico) {
-      this.toastService.showError('Función solo disponible para médicos');
+    if (!this.isMedico && !this.isFamiliar) {
+      this.toastService.showError('Función solo disponible para médicos y familiares autorizados');
       return;
     }
     this.openRegistroDialog(signosVitales);
@@ -181,6 +187,7 @@ export class SignosVitalesComponent implements OnInit, OnDestroy {
       this.toastService.showError('Función solo disponible para médicos');
       return;
     }
+
     this.signosVitalesService.eliminar(id).subscribe({
       next: () => {
         this.toastService.showSuccess('Registro eliminado correctamente');

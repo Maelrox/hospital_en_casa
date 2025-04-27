@@ -10,13 +10,25 @@
             <mat-label>Buscar</mat-label>
             <input matInput (keyup)="applyFilter($event)" placeholder="Buscar..." #input>
           </mat-form-field>
-          <button mat-raised-button color="primary" (click)="openRegistroDialog()" *ngIf="isMedico">
+          <button mat-raised-button color="primary" (click)="openRegistroDialog()">
             <mat-icon>add</mat-icon>
             Nuevo Registro
           </button>
         </div>
 
-        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+        <div *ngIf="dataSource.data.length === 0" class="empty-state">
+          <mat-icon class="empty-state-icon">monitoring</mat-icon>
+          <h2 class="empty-state-title">Sin registros de signos vitales</h2>
+          <p class="empty-state-subtitle" *ngIf="input.value">
+            No se encontraron registros que coincidan con "{{input.value}}"
+          </p>
+          <button mat-raised-button color="primary" (click)="openRegistroDialog()" class="empty-state-button">
+            <mat-icon>add</mat-icon>
+            Crear primer registro
+          </button>
+        </div>
+
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" *ngIf="dataSource.data.length > 0">
           <!-- Fecha Registro Column -->
           <ng-container matColumnDef="fechaRegistro">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha Registro </th>
@@ -99,7 +111,7 @@
           <ng-container matColumnDef="acciones">
             <th mat-header-cell *matHeaderCellDef> Acciones </th>
             <td mat-cell *matCellDef="let element">
-              <button mat-icon-button color="primary" (click)="editarRegistro(element)" *ngIf="isMedico">
+              <button mat-icon-button color="primary" (click)="editarRegistro(element)" *ngIf="isMedico || isFamiliar">
                 <mat-icon>edit</mat-icon>
               </button>
               <button mat-icon-button color="warn" (click)="eliminarRegistro(element.idSignos!)" *ngIf="isMedico">
@@ -110,14 +122,9 @@
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-          <!-- Row shown when there is no matching data. -->
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" colspan="displayedColumns.length">No se encontraron registros que coincidan con "{{input.value}}"</td>
-          </tr>
         </table>
 
-        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of vital signs"></mat-paginator>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of vital signs" *ngIf="dataSource.data.length > 0"></mat-paginator>
       </div>
     </mat-card-content>
   </mat-card>

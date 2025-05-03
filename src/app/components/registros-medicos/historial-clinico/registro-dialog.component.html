@@ -2,45 +2,14 @@
 
 <mat-dialog-content>
   <form [formGroup]="registroForm" class="form-container">
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field" *ngIf="tipoRegistrador === 'medico'">
-        <mat-label>Paciente</mat-label>
-        <mat-select formControlName="idPaciente" [panelClass]="'patient-select-panel'">
-          <div class="search-container">
-            <mat-icon class="search-icon">search</mat-icon>
-            <input
-              matInput
-              type="text"
-              placeholder="Buscar por nombre o documento"
-              [ngModel]="pacienteSearchTerm"
-              (ngModelChange)="onSearchInput($event)"
-              [ngModelOptions]="{standalone: true}"
-              (click)="$event.stopPropagation()"
-              (keydown.space)="$event.stopPropagation()"
-              autocomplete="off"
-              class="search-input"
-            />
-          </div>
-          <mat-option
-            *ngFor="let paciente of filteredPacientes"
-            [value]="paciente.idPaciente"
-            (onSelectionChange)="onPacienteSelected(paciente)"
-          >
-            {{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellido }} - {{ paciente.usuario?.documentoIdentidad }}
-          </mat-option>
-          <mat-option *ngIf="filteredPacientes.length === 0" disabled>
-            <div class="no-data-message">
-              <mat-icon>info</mat-icon>
-              <span>Aún no hay pacientes registrados</span>
-            </div>
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="registroForm.get('idPaciente')?.hasError('required')">
-          La selección del paciente es requerida
-        </mat-error>
-      </mat-form-field>
 
-      <input type="hidden" formControlName="idPaciente" *ngIf="tipoRegistrador !== 'medico'">
+    <div class="form-row">
+      <app-patient-selector 
+        class="form-field patient-selector"
+        [control]="registroForm.get('idPaciente')!"
+        [initialPatientId]="data.historial?.idPaciente"
+        (patientSelected)="onPacienteSelected($event)">
+      </app-patient-selector>
     </div>
 
     <div class="form-row">
@@ -81,4 +50,24 @@
   <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!registroForm.valid">
     {{ data.historial ? 'Actualizar' : 'Guardar' }}
   </button>
-</mat-dialog-actions> 
+</mat-dialog-actions>
+
+<style>
+.form-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-field {
+  width: 100%;
+}
+</style> 

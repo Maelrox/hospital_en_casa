@@ -175,7 +175,7 @@ export class SignosVitalesComponent implements OnInit, OnDestroy {
   }
 
   editarRegistro(signosVitales: SignosVitales) {
-    if (!this.isMedico && !this.isFamiliar) {
+    if (!this.isMedico && !this.isFamiliar && !this.isPaciente) {
       this.toastService.showError('Función solo disponible para médicos y familiares autorizados');
       return;
     }

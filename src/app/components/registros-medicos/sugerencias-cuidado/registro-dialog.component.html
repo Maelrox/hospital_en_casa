@@ -1,40 +1,23 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Editar Sugerencia' : 'Nueva Sugerencia' }}</h2>
+<h2 mat-dialog-title>{{ data.sugerencia ? 'Editar' : 'Nueva' }} Sugerencia de Cuidado</h2>
 
 <mat-dialog-content>
   <form [formGroup]="form" class="form-container">
     <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Paciente</mat-label>
-        <input type="hidden" formControlName="idPaciente">
-        
-        <!-- For médicos -->
-        <mat-select *ngIf="tipoRegistrador === 'medico'" formControlName="idPaciente" required>
-          <div class="search-container">
-            <mat-icon class="search-icon">search</mat-icon>
-            <input class="search-input" 
-                   placeholder="Buscar paciente..." 
-                   (input)="filterPacientes()" 
-                   (keydown)="$event.stopPropagation()"
-                   [formControl]="searchControl">
-          </div>
-          
-          <mat-option *ngFor="let paciente of filteredPacientes" 
-                     [value]="paciente.idPaciente"
-                     (click)="onPacienteSelected(paciente)">
-            {{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellido }} - {{ paciente.usuario?.documentoIdentidad }}
-          </mat-option>
-          
-          <div *ngIf="filteredPacientes.length === 0" class="no-data-message">
-            <mat-icon>info</mat-icon>
-            <span>No se encontraron pacientes</span>
-          </div>
-        </mat-select>
+      <app-patient-selector 
+        class="form-field patient-selector"
+        [control]="form.get('idPaciente')!"
+        [initialPatientId]="data.sugerencia?.idPaciente"
+        (patientSelected)="onPacienteSelected($event)">
+      </app-patient-selector>
+    </div>
 
-        <!-- For non-médicos -->
-        <input *ngIf="tipoRegistrador !== 'Medico'" 
-               matInput 
-               [value]="form.get('idPaciente')?.value" 
-               disabled>
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="descripcion" rows="3"></textarea>
+        <mat-error *ngIf="form.get('descripcion')?.hasError('required')">
+          La descripción es requerida
+        </mat-error>
       </mat-form-field>
     </div>
 
